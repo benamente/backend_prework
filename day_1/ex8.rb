@@ -39,18 +39,18 @@ end
 
 
 
-  age = in_age
-  height = in_height
-  weight = in_weight
+age = in_age
+height = in_height
+weight = in_weight
 
-  age, height, weight = ask_until_confirmed(age, height, weight)
-
-
+age, height, weight = ask_until_confirmed(age, height, weight)
 
 
 
 
 
+
+=begin
 print "How smart are you? "
 iq = gets.chomp
 print "How normal are you? "
@@ -59,3 +59,4 @@ print "How much do you care? "
 investment = gets.chomp
 
 puts "Wow. You're #{iq} intelligent, #{norm} normal and you care #{investment}."
+=end
