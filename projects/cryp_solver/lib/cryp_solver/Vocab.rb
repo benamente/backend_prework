@@ -47,15 +47,10 @@ module Vocab
 
     end
     if poss
-
-
       if poss.length == 0
         wordlist = "NONE FOUND"
-      elsif poss.length <= 75
-        wordlist = poss
       else
-        p poss
-        wordlist = "MANY"
+        wordlist = poss
       end
     end
   end

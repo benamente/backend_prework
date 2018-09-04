@@ -2,6 +2,7 @@ require "./lib/cryp_solver/custom_array_methods.rb"
 require "./lib/cryp_solver/custom_string_methods.rb"
 require "./lib/cryp_solver/Vocab.rb"
 require "./lib/cryp_solver/XWordSearch.rb"
+require "./lib/cryp_solver/WordData.rb"
 
 require "pp"
 
@@ -43,41 +44,6 @@ def pop_name_attribution(string)
   return [arr.join(" "), names.join(" ")]
 end
 
-#Given an array of words and an X word in the form AXBACCAnBA, eliminates all words from the array whose letters don't match the pattern of repeaters of the given word.
-
-def eliminate_based_on_repeater_positions(x_word, array_of_words)
-  a = array_of_words.select{|word| word.length == x_word.length}
-  a = a.select{|word| x_word.get_indices_of_repeaters('X') == word.get_indices_of_repeaters}
-end
-
-
-#Given a 'replist', a list of words with repeat characters, returns a nested array(possnest), the 0 position of each array holding the original words
-#the 1 position holding a list (no great than 9) of words of the same length with the same pattern of repeating characters. Words with no possibilities
-#or more than 9 possibilites are cut from the list.
-def get_possnest_from_replist(replist)
-  poss = replist.map do |w|
-    list = get_possibility_list_from_x_repword(w)
-    if list != [] && list.length <= 9
-      if w.is_a?(Array)
-        w[1] << list
-      else
-        w = [w] << list
-      end
-    end
-  end
-  poss.compact!
-  return poss
-end
-
-
-
-
-
-
-
-
-
-
 
 #returns true if for both words (should be same length), the given letter is
 #in the same positions
@@ -114,15 +80,92 @@ class Guess
     a = pop_name_attribution(cgram_s)
     cgram = a[0]
     @names = a[1]
-    cgram_punctless = cgram.delete("-,?.!:").downcase
-    cgram_punctless_array = cgram_punctless.split(/ /)
-    word_list = cgram_punctless_array.clone.map {|x| [x, x.x_out_nonrepeaters]}
-    @word_tracker = word_list.uniq.map {|x| [x[0], x[1], x[2], x[3]]}
+    word_list = cgram.downcase.split(/ /)
+    @word_tracker = []
 
+    rel_location = 1
+    word_list.each_with_index do |word, i|
+
+      abs_location = i
+      if ".?!;,".include?(word[-1])
+        rel_location = :end
+        case word[-1]
+        when "."
+          sentence_type = :statement
+        when "!"
+          sentence_type = :exclamation
+        when "?"
+          sentence_type = :question
+        end
+      end
+
+      punct = word.delete_and_return("-?;:,.!()")
+
+      if i > 0
+        prev_word = word_list[i - 1]
+        #p @word_tracker
+        prev_end = @word_tracker.return_object_with("abs_location", [i - 1])
+        if prev_end && prev_end.rel_location == [:end]
+          rel_location = 1
+        end
+      else
+        prev_word = nil
+      end
+
+      if i < word_list.length - 1
+        next_word = word_list[i + 1]
+      else
+        next_word = nil
+      end
+
+      cryp_text = word.clone
+      x_string = cryp_text.x_out_nonrepeaters()
+
+      if @word_tracker == []
+        seen_before = false
+      elsif @word_tracker.list_attribute("cryp_text").include?(cryp_text)
+        seen_before = true
+      else
+        seen_before = false
+      end
+      if seen_before == false
+        @word_tracker << WordData.new(cryp_text, x_string, abs_location, rel_location, prev_word, next_word)
+      else
+        twin = @word_tracker.return_object_with("cryp_text", cryp_text)
+        twin.abs_location.concat << abs_location
+        twin.rel_location << rel_location
+        twin.prev_word.concat << prev_word
+        twin.next_word.concat << next_word
+        twin.freq += 1
+      end
+
+      if rel_location.is_a? Integer
+        rel_location += 1
+      end
+
+    end
+  end
+
+  def print_WT_with(*data)
+    @word_tracker.each do |x|
+      print "#{x.cryp_text}:"
+      max_length = @word_tracker.max_attribute("length")
+      num_spaces = max_length - x.cryp_text.length + 2
+      print " " * num_spaces
+      data.each do |d|
+        if x.public_send(d).is_a? Array
+          print x.public_send(d).to_uncluttered_string_limited(40)
+        elsif x.public_send(d).is_a? String
+          print x.public_send(d)
+        end
+        #print "#{x.x_word.d}"
+      end
+      puts ""
+    end
   end
 
   def try_for_loner(c)
-    loner = self.word_tracker.extract(0).get_words_of_length(1)[0]
+    loner = self.word_tracker.list_attribute("cryp_text").get_words_of_length(1)[0]
     try = Guess.new
     try.alpha_tracker[loner] = c
     try.logic_loop
@@ -132,11 +175,10 @@ class Guess
   #applies an equivalence to the guess's word_tracker. If the 'c'ryp letter is q
   #and 's'olves to e, the argument should take the form ('q', 'e')
   def apply_eq_to_WT(c,s)
-    @word_tracker = @word_tracker.map do |x|
-      cryppy_inds = x[0].get_indices_of_letter(c)
-      x[1] = x[1].insert_at_indices(s, cryppy_inds)
-
-      [x[0], x[1], x[2], x[3]]
+    @word_tracker = @word_tracker.map do |wd|
+      cryppy_inds = wd.cryp_text.get_indices_of_letter(c)
+      wd.x_word = wd.x_word.insert_at_indices(s, cryppy_inds)
+      wd
     end
   end
 
@@ -145,7 +187,7 @@ class Guess
   def get_unsolved_of_word(cword)
     solved = wik_AT.keys
     x = @word_tracker.assoc(cword)
-    return x[0].delete(solved.join)
+    return x.cryp_text.delete(solved.join)
   end
 
   #returns a string of a words solved letters. If input is 'fwou' and f and w have
@@ -154,7 +196,7 @@ class Guess
     solved = wik_AT.keys
     x = @word_tracker.assoc(cword)
 
-    return (x[0].chars & solved).join
+    return (x.cryp_text.chars & solved).join
   end
 
 
@@ -210,7 +252,7 @@ class Guess
   #be a nested array, eg [["cqi", ["hid", "bid"]], [qi, ["if", "is"]]]
   def add_many_poss(nested)
     nested.each do |x|
-      add_poss(x[0], x[1])
+      add_poss(x.cryp_text, x.x_word)
     end
   end
 
@@ -230,7 +272,7 @@ class Guess
   def partway_solved
     arr = []
     @word_tracker.each do | x |
-      if x[1].include?('X') && x[1].has_chars_besides?("X","'")
+      if x.x_word.include?('X') && x.x_word.has_chars_besides?("X","'")
         arr << x
       end
     end
@@ -253,6 +295,19 @@ class Guess
   end
 
 
+  def find_possible_solutions(worddataobject)
+    worddataobject.possible_solutions = Vocab.get_possible_wordlist_from_x_word(worddataobject.x_word)
+  end
+
+  def find_possible_solutions_for_all
+    @word_tracker.each do |word|
+      find_possible_solutions(word)
+    end
+  end
+
+
+
+
   #gets a nested array of cryp words and their possible solutions from
   #the guess's partway solved words (no list of possible solutions will be
   #greater than 9)
@@ -260,14 +315,14 @@ class Guess
   def get_possnest_from_pw_s
     pws = self.partway_solved
     pws.map! do |x|
-      [x[0], Vocab.get_possible_wordlist_from_x_word(x[1], *self.wik_AT.values)]#, x[3]
+      [x.cryp_text, Vocab.get_possible_wordlist_from_x_word(x.x_word, *self.wik_AT.values)]#, x[3]
     end
     return pws
   end
   #Marks "SOLVED" at the 2 index of all words that have been solved
   def mark_SOLVED
     @word_tracker.map! do |x|
-      [x[0],x[1], x[1].include?('X') ? x[2] : "SOLVED", x[3]]
+      [x.cryp_text,x.x_word, x.x_word.include?('X') ? x[2] : "SOLVED", x[3]]
     end
   end
 
@@ -323,21 +378,21 @@ class Guess
         next
       end
       narrowed = []
-      schs = x[1].delete('X')
+      schs = x.x_word.delete('X')
 
       x[2].each do |w|
         contradicts = 0
-        if contra_solved_letters?(x[1],w)
+        if contra_solved_letters?(x.x_word,w)
           contradicts += 1
         end
         schs.chars.each do |c|
-          if x[1].get_indices_of_letter(c) != w.get_indices_of_letter(c)
+          if x.x_word.get_indices_of_letter(c) != w.get_indices_of_letter(c)
             contradicts += 1
           end
         end
         narrowed << w if contradicts == 0
       end
-      new_posses << [x[0], narrowed] unless narrowed == x[2]
+      new_posses << [x.cryp_text, narrowed] unless narrowed == x[2]
     end
     self.add_many_poss(new_posses)
   end
@@ -349,13 +404,13 @@ class Guess
     count = 0
     while (count < 100)
       #pp @word_tracker
-      pp self.word_tracker
+      #pp self.word_tracker
 
       test1 = self.get_possnest_from_pw_s
 
       self.add_many_poss(test1)
       self.one_poss_words.each do |x|
-        self.apply_word_to_AT(x[0],x[2].join)
+        self.apply_word_to_AT(x.cryp_text,x[2].join)
       end
       self.apply_AT_eq_to_WT
       count += 1

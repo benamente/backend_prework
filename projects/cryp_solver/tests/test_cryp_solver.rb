@@ -18,21 +18,18 @@ class Test_cryp_solver < Test::Unit::TestCase
     assert_equal("XRRXXXR".get_indices_of_repeaters('X'), [[1, 2, 6]])
   end
 
-  def test_eliminate_based_on_repeater_positions()
-    x_word = "hXUUX"
-    array_of_words = ["happy", "helpy", "hurry", "health"]
-    assert_equal(["happy","hurry"], eliminate_based_on_repeater_positions(x_word, array_of_words))
-  end
-
   def test_remove_all_without
     assert_equal(["Hello"],["Hello", "world", "unwelcome"].remove_all_without('e', 1))
   end
-  # 
-  # def test_Guess
-  #   guess_one = Guess.new()
-  #   guess_one.init_WT_from_string("Q ATF'I RFTX CTX ZTW BOOE MYTWI TEA MPO... YWI QF SZ NMVO, Q AQAF'I OJOF VOO QI NTSQFP. QI CQI SO BHTS ICO HOMH. --GCZEEQV AQEEOH")
-  #   assert_equal( guess_one.word_tracker, [["q", "X", nil], ["atf'i", "XXX'X", nil], ["rftx", "XXXX", nil], ["ctx", "XXX", nil], ["ztw", "XXX", nil], ["booe", "XOOX", nil], ["mytwi", "XXXXX", nil], ["tea", "XXX", nil], ["mpo", "XXX", nil], ["ywi", "XXX", nil], ["qf", "XX", nil], ["sz", "XX", nil], ["nmvo", "XXXX", nil], ["aqaf'i", "AXAX'X", nil], ["ojof", "OXOX", nil], ["voo", "XOO", nil], ["qi", "XX", nil], ["ntsqfp", "XXXXXX", nil], ["cqi", "XXX", nil], ["so", "XX", nil], ["bhts", "XXXX", nil], ["ico", "XXX", nil], ["homh", "HXXH", nil]])
-  # end
+
+  def test_Guess
+    guess_one = Guess.new()
+    guess_one.init_WT_from_string("Q ATF'I RFTX CTX ZTW BOOE MYTWI TEA MPO... YWI QF SZ NMVO, Q AQAF'I OJOF VOO QI NTSQFP. QI CQI SO BHTS ICO HOMH. --GCZEEQV AQEEOH")
+    assert_equal(guess_one.word_tracker[5].x_word, "XOOX")
+    assert_equal(guess_one.word_tracker[6].x_word, "XXXXX")
+    assert_equal(guess_one.word_tracker[7].x_word, "XXX")
+    assert_equal(guess_one.word_tracker[13].x_word, "AXAX'X")
+  end
 
   def test_Vocab
     assert_equal(["all", "see", "too", "off", "add", "egg", "fee", "odd", "ill", "ass", "bee"], Vocab.get_possible_wordlist_from_x_word("XAA"))

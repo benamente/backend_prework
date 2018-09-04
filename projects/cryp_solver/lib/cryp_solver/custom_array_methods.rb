@@ -1,5 +1,77 @@
 
 module UsefulArrays
+
+  def max_attribute(attribute)
+    max = 0
+    self.each do |x|
+      if x.public_send(attribute) > max
+        max = x.public_send(attribute)
+      end
+    end
+    return max
+  end
+
+  def list_attribute(attribute)
+    list = []
+    self.each do |x|
+      list << x.public_send(attribute)
+    end
+    return list
+  end
+
+  def return_object_with(attribute, value)
+    #p self[0].public_send(attribute)
+    #p value
+    self.each do |x|
+      if x.public_send(attribute) == value
+        return x
+      end
+    end
+    return nil
+  end
+
+  def to_uncluttered_string
+    string = ""
+    self.each_with_index do |value, index|
+      unless index == 0
+        string += " "
+      end
+      string += value
+      unless index == self.length - 1
+        string += ","
+      end
+    end
+    return string
+  end
+
+#prints an uncluttered string no more than limit chars long. Says how many more items are in the array
+  def to_uncluttered_string_limited(limit)
+    string = ""
+    self.each_with_index do |value, index|
+      unless index == 0
+        string += " "
+      end
+      if value == nil
+        string += "---"
+      elsif
+        string += value.to_s
+      end
+      unless index == self.length - 1
+        string += ","
+      end
+      next_length = 0
+      if self[index + 1]
+        next_length = self[index +1].to_s.length
+      end
+      if string.length + next_length > limit - 9
+        string += " & #{self.length - (index + 1)} more"
+        break
+      end
+    end
+    return string
+  end
+
+
     def has_els_besides?(*e)
         if self - e != []
             return true
@@ -79,6 +151,7 @@ module UsefulArrays
         end
       end
     end
+
 
     #removes all arrays from an array if they cointain a nil element
     def remove_all_with_nil

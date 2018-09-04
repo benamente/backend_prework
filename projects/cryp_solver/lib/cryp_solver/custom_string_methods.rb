@@ -17,6 +17,17 @@ module UsefulStrings
     end
   end
 
+  def delete_and_return(str)
+    wanted = ""
+    str.chars.each do |c|
+      if self.include?(c)
+        wanted += c
+      end
+    end
+    self.delete!(str)
+    return wanted
+  end
+
   #returns true if there are any characters besides the ones listed in the argument
   def has_chars_besides?(*c)
     if self.delete(c.join).length > 0
