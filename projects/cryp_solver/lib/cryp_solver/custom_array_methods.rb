@@ -20,14 +20,23 @@ module UsefulArrays
   end
 
   def return_object_with(attribute, value)
-    #p self[0].public_send(attribute)
-    #p value
+
     self.each do |x|
       if x.public_send(attribute) == value
         return x
       end
     end
     return nil
+  end
+
+  def return_objects_with(attribute, value)
+    new_arr = []
+    self.each do |x|
+      if x.public_send(attribute) == value
+        new_arr << x
+      end
+    end
+    return new_arr
   end
 
   def to_uncluttered_string
