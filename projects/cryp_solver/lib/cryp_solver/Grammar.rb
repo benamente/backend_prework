@@ -1,6 +1,8 @@
-require_relative "WordData.rb"
+require_relative "DataObjects.rb"
 require_relative "Vocab.rb"
 require_relative "Probability.rb"
+require_relative "Trackers.rb"
+
 
 class String
   def part_of_speech
@@ -34,18 +36,44 @@ module Grammar
     end
   end
 
-  def self.get_info_from_punc_on_word(word)
+  def self.get_info_from_punc_on_word(word, details = {})
+    prev_word = details[:prev_word] || prev_word = nil
+    info = {}
     if ".?!;,".include?(word[-1])
-      rel_location = :end
       case word[-1]
       when "."
+        letters = word.chars.select{|c| c.letter?}
+        if letters.length == 2
+          info = {proper: :title_2}
+        elsif letters[-3] == "."
+          info = {acronym: 99}
+        elsif letters.length == 3
+          info = {proper: :title_3}
+        end
         sentence_type = :statement
       when "!"
         sentence_type = :exclamation
       when "?"
         sentence_type = :question
       end
-      return [rel_location, sentence_type]
+      rel_location = :end
+      if info == {}
+        info = {rel_location: rel_location, sentence_type: sentence_type}
+      end
     end
+    if "-—".include?(word[0])
+      attribution = 60
+      if "-—".include?(word[1])
+        attribution += 30
+      end
+      if prev_word && prev_word.rel_location = :end
+        attribution += 30
+      end
+      info[:attribution] = attribution
+    end
+    return info
   end
+
+
+
 end

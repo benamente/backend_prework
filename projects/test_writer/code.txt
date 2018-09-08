@@ -1,2 +1,5 @@
-p Vocab.get_possible_wordlist_from_x_word("AiAX'X", "i")
-["didn't", "pipe's"]
+Grammar.get_info_from_punc_on_word("--")
+#{:attribution=>90}
+
+Grammar.get_info_from_punc_on_word("Mrs.")
+#{:proper=>:title_3}

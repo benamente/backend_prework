@@ -11,7 +11,7 @@ class Array
         else
           print x.public_send(d).to_s
         end
-        #print "#{x.x_word.d}"
+        #print "#{x.x_string.d}"
       end
       puts ""
     end

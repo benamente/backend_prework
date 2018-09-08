@@ -126,6 +126,49 @@ module UsefulStrings
     return arr
   end
 
+  def get_indices_of_uppers
+    arr =[]
+    self.chars.each do |c|
+      if c.is_upper?
+        arr << self.index(c)
+      end
+    end
+  end
+
+
+  def split_off_attribution
+    if self == ""
+      return self
+    end
+    arr = self.split(/ /)
+    first_name = ""
+    names = []
+    num = 6
+    if num > arr.length - 1
+      num = arr.length - 1
+    end
+    arr[num..-1].each do | x |
+      if x[0] == ('-') || x[0] == ('—')
+        if [".","?","!"].include?(arr[arr.index(x) - 1][-1])
+          first_name = x
+          break
+        end
+      end
+    end
+    unless first_name
+      return self
+    end
+    if first_name != ""
+      n = arr.index(first_name)
+      q = arr.length - n
+      for i in (1..q)
+        names << arr[n]
+        arr.delete_at(n)
+      end
+    end
+    return [arr.join(" "), names.join(" ")]
+  end
+
 end
 
 class String

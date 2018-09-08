@@ -1,15 +1,15 @@
 
 
 
-require_relative "Tabs.rb"
-require_relative "WordData.rb"
+require_relative "Trackers.rb"
+require_relative "DataObjects.rb"
 require_relative "Equivalency.rb"
 require_relative "Deduction.rb"
 
 
 
 class Guess
-  attr_accessor :goodness, :badness, :eq, :already_failed, :tabs, :name, :adjusted_goodness
+  attr_accessor :goodness, :badness, :eq, :already_failed, :tracker, :name, :adjusted_goodness
   @@all_guesses = []
   def initialize(equilvancy_to_try, goodness)
     if @@all_guesses.list_attribute(:eq).include?(equilvancy_to_try)
@@ -55,9 +55,9 @@ def best_guess(arr_of_guesses)
   good_guess = arr_of_guesses.return_objects_with(:already_failed, false).max_attribute(:adjusted_goodness)
 end
 
-def suggest_guesses(tabs)
-  a = letter_guesses(tabs.alpha_tracker)
-  b = word_guesses(tabs.word_tracker)
+def suggest_guesses(tracker)
+  a = letter_guesses(tracker.letter_tracker)
+  b = word_guesses(tracker.word_tracker)
   if !a
     return b
   elsif !b
@@ -80,7 +80,7 @@ def word_guesses(wt)
     if num_poss < 6 && num_poss > 0
       goodness_arr = Math.calc_goodness(num_poss)
       word.likely_solutions.each_with_index do |x, index|
-        guesses << Guess.new(Equivalency.new(:solution, x), goodness_arr[index])
+        guesses << Guess.new(Equivalency.new(word.cryp_text, x), goodness_arr[index])
       end
     end
   end

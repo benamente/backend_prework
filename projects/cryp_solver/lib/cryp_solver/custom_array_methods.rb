@@ -4,17 +4,21 @@ module UsefulArrays
   def max_attribute(attribute)
     max = 0
     self.each do |x|
-      if x.public_send(attribute) > max
+      if x && x.public_send(attribute) > max
         max = x.public_send(attribute)
       end
     end
     return max
   end
 
-  def list_attribute(attribute)
+  def list_attribute(attribute, att_of_att = nil)
     list = []
     self.each do |x|
-      list << x.public_send(attribute)
+      if att_of_att
+        list << x.public_send(attribute).public_send(att_of_att)
+      else
+        list << x.public_send(attribute)
+      end
     end
     return list
   end
