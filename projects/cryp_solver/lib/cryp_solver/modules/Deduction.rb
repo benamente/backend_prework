@@ -1,5 +1,5 @@
-require_relative "Guess.rb"
-require_relative "DataObjects.rb"
+require_relative "../classes/Guess.rb"
+require_rel "../classes/DataObjects"
 
 module Deduction
   def find_all_must_letters(wt)
@@ -22,7 +22,7 @@ module Deduction
       if add == false
         next
       else
-        arr << Guess.new(WordEq.new(word.cryp_text[i], letter), 90)
+        arr << Guess.new(:letter, word.cryp_text[i], letter, 90)
       end
     end
     return arr

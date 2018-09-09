@@ -1,6 +1,5 @@
-require_relative "custom_array_methods.rb"
-require_relative "custom_string_methods.rb"
-require_relative "Trackers.rb"
+Dir["../modules/basics/*.rb"].each {|file| require file }
+require_relative "../classes/trackers/Trackers"
 
 
 
@@ -87,6 +86,12 @@ module XWordSearch
     else
       return false
     end
+  end
+
+  #cows isn't in our dictionary that returns with POS, but cow is. Given cows,
+  #it will return a similar word that's in the dictionary: cow. If asked, it will also return
+  #what made cows different from cow, ie it was plural.
+  def find_basic_form
   end
 
 end

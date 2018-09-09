@@ -1,17 +1,13 @@
-require_relative "DataObjects.rb"
+require_rel "../classes/DataObjects"
 require_relative "Vocab.rb"
-require_relative "Probability.rb"
-require_relative "Trackers.rb"
+require_rel "../structs"
+require_rel "../classes/Trackers"
 
 
 class String
   def part_of_speech
     pos = Vocab::ALL_COMMON_WITH_PART_OF_SPEECH[self]
-    if pos
-      return pos
-    else
-      return "UNKOWN"
-    end
+    return pos
   end
 end
 
@@ -21,7 +17,7 @@ module Grammar
   def self.check_tarzan(word_or_word_tracker)
     if word_or_word_tracker.is_a? WordData
       word = word_or_word_tracker
-      word.prev_word.each do |pw|
+      word.prev_word_ob.each do |pw|
         if pw && pw.solution && pw.solution.part_of_speech == "p"
           ["n","p","j"].each do |z|
             word.parts_of_speech_not << Probability.new(z, 98)
@@ -30,7 +26,7 @@ module Grammar
       end
     else
       wt = word_or_word_tracker
-      wt.each do |word|
+      wt.array.each do |word|
         check_tarzan(word)
       end
     end

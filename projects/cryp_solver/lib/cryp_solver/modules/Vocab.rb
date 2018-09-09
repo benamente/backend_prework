@@ -1,7 +1,7 @@
-require_relative "custom_array_methods.rb"
-require_relative "custom_string_methods.rb"
+Dir["../modules/basics/*.rb"].each {|file| require file }
 require_relative "XWordSearch.rb"
 require "yaml"
+
 module Vocab
 
   def self.set_up_dict_array(file_with_one_column)

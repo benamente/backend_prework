@@ -1,5 +1,6 @@
-require_relative "Vocab.rb"
-require_relative "Grammar.rb"
+require_relative "../../modules/Vocab.rb"
+require_relative "../../modules/Grammar.rb"
+require_rel "../Trackers"
 
 
 
@@ -46,6 +47,7 @@ class UnigramData < DataObject
   attr_accessor :abs_location, :rel_location, :punctuation, :freq, :name, :commonness
   attr_accessor :length, :prev_word, :next_word, :word_or_name
 end
+
 class WordData < UnigramData
 
   def initialize(cryp_text, hash ={})
@@ -85,10 +87,6 @@ class WordData < UnigramData
     @likely_solutions = Vocab.get_likely_wordlist_from_x_string(x_string)
   end
 
-  def print_pretty(*options)
-
-  end
-
 end
 
 class PronounData < UnigramData
@@ -96,3 +94,14 @@ class PronounData < UnigramData
 
 
 end
+
+
+
+
+
+
+
+
+
+
+  

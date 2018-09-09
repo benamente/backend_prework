@@ -171,6 +171,130 @@ module UsefulStrings
 
 end
 
+module DatableStrings
+
+  def split_into_dataObjects (options = {})
+
+    if self.include?(" ")
+      default = :word
+    else
+      default = :letter
+    end
+
+    by = options[:by] || by = default
+
+    if by == :word
+      items = self.downcase.split(/ /)
+      proper = false
+    elsif by == :letter
+      items = self.downcase.chars
+    end
+
+
+
+    storarray = []
+    prev_item = nil
+    rel_location = 0
+    items.each_with_index do |item, index|
+      # if by == :letter
+      #   puts "top" + storarray.inspect
+      # end
+
+      if by == :letter
+        if item == " "
+          rel_location = 0
+        end
+        unless item.letter?
+          next
+        end
+      end
+
+
+      if by == :word
+        info = Grammar.get_info_from_punc_on_word(item, prev_word: prev_item)
+        rel_location = info[:rel_location] || rel_location = rel_location
+        sentence_type = info[:sentence_type] || sentence_type = nil
+        proper = info[:proper] || proper = proper
+        attribution = info[:attribution] || attribution = 0
+      end
+
+      punct = item.delete_and_return("-?;:,.!()")
+
+      if index > 0
+        prev_item_s = items[index - 1]
+        prev_item = storarray.return_object_with(:cryp_text, prev_item_s)
+        if by == :word
+          #prev_end = storarray.return_object_with("abs_location", [index - 1])
+          if prev_item && prev_item.rel_location[-1] == :end
+            rel_location = 0
+          end
+        elsif by == :letter
+          space_ind = self.index(" ", index)
+          if !space_ind
+            space_ind = items.length + 1
+          end
+          if items.length > 2
+            front_loc = rel_location
+            back_loc = index - space_ind
+            location = [front_loc, back_loc]
+          end
+
+        end
+      end
+
+
+
+      cryp_text = item.clone
+
+      if by == :word
+        x_string = cryp_text.x_out_nonrepeaters()
+      end
+      if storarray == []
+        seen_before = false
+      elsif storarray.list_attribute("cryp_text").include?(cryp_text)
+        seen_before = true
+      else
+        seen_before = false
+      end
+      if seen_before == false
+        case by
+        when :word
+          storarray << WordData.new(cryp_text, x_string: x_string, abs_location: index, rel_location: rel_location, prev_word: prev_item_s)
+        when :letter
+          storarray << LetterData.new(cryp_text, locations: [location], prev_letter: [prev_item_s])
+        end
+      elsif seen_before == true
+        twin = storarray.return_object_with("cryp_text", cryp_text)
+        case by
+        when :word
+          twin.abs_location.concat << index
+          twin.rel_location << rel_location
+          twin.prev_word.concat << prev_item
+        when :letter
+          twin.locations << location
+          twin.prev_letter << prev_item
+        end
+        twin.freq += 1
+      end
+
+      if rel_location.is_a? Integer
+        rel_location += 1
+      end
+      # if by == :letter
+      #   puts "bottom" + storarray.inspect
+      # end
+    end
+
+    return storarray
+
+  end
+
+end
+
+
+
+
 class String
   include UsefulStrings
+  include DatableStrings
 end
