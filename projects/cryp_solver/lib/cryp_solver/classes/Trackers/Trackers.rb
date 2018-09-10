@@ -1,7 +1,7 @@
 require "rubygems"
 require "require_all"
 
-require_rel "basics"
+require_rel "../../modules/basics"
 
 require_relative "../../modules/Vocab.rb"
 require_relative "../../modules/XWordSearch.rb"

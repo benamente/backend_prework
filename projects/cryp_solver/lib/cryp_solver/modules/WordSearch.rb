@@ -5,7 +5,7 @@ module WordSearch
 
 #returns with an integer, 0-100 of it's likelihood of being a word
   def self.word_likelihood(string)
-    if Vocab::ALL_COMMON_FORMS.include?(string)
+    if Vocab::ALL_COMMON_FORMS.include?(string.delete(".,-?!:;\"\'"))
       return 100
     elsif
       Vocab::SO_MANY_WORDS.include?(string)
