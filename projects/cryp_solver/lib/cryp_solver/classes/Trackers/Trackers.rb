@@ -22,7 +22,7 @@ class Tracker
     att_of_att = hash[:att_of_att] || att_of_att = {}
     limit = hash[:limit] || limit = 35
 
-    self.array.each do |dataob|
+    self.all.values.each do |dataob|
       atts.each_with_index do |att, i|
         realat = dataob.public_send(att)
         if realat.is_a? DataObject
@@ -36,9 +36,9 @@ class Tracker
           else
             print "#{realat.to_s}"
             if realat.is_a? String
-              max_length = self.array.list_attribute(att, :to_s).max_attribute(:length)
+              max_length = self.all.values.list_attribute(att, :to_s).max_attribute(:length)
             elsif realat.is_a? Integer
-              max_length = self.array.list_attribute(att, :to_s).max_attribute(:length)
+              max_length = self.all.values.list_attribute(att, :to_s).max_attribute(:length)
             end
             num_spaces = max_length - dataob.name.length + 2
           end
@@ -62,12 +62,12 @@ end
 
 
 class LetterTracker < Tracker
-  attr_accessor :array
+  attr_accessor :all
 
   def initialize(string)
 
-    @array = string.split_into_dataObjects(by: :letter)
-     p @array
+    array = string.split_into_dataObjects(by: :letter)
+    @all = (array.map { |x| [x.name, x]}).to_h
 
   end
 
@@ -125,15 +125,16 @@ end
 
 
 class UnigramTracker < Tracker
-  attr_reader :array, :progress
+  attr_reader :all, :progress
 
   def initialize(cgram_s)
-    @array = cgram_s.split_into_dataObjects
+    array = cgram_s.split_into_dataObjects
+    @all = (array.map { |x| [x.name, x]}).to_h
     self.lookup_all_likely_words
   end
 
   def lookup_all_likely_words
-    self.array.each do |word|
+    self.all.values.each do |word|
       word.lookup_likely_words
     end
   end
@@ -144,7 +145,7 @@ end
 
 
 class GuessTracker < Tracker
-  attr_accessor :array
+  attr_accessor :all
   def initialize
     @array = []
   end
