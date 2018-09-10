@@ -65,16 +65,21 @@ end
 class LetterTracker < Tracker
   attr_accessor :all
 
+  def simplify_locs
+    @all.each do
+      x.fdsf
+    end
+  end
+
   def initialize(string)
 
     array = string.split_into_dataObjects(by: :letter)
     @all = (array.map { |x| [x.name, x]}).to_h
 
+
   end
 
-  def each
-    hash.each
-  end
+
 end
 
 
@@ -103,16 +108,12 @@ class CrypTracker < Tracker
       end
       @@count += 1
       @id = @@count
+      @g_t.gather_good_guesses(self)
     end
-  end
-
-  def get_guesses
-    g_t << Guess.Generate
-    # def suggest_and_print_guesses
-    #   suggest_guesses(self).print_with([:goodness])
-    # end
 
   end
+
+
 end
 
 
@@ -126,11 +127,13 @@ end
 
 
 class UnigramTracker < Tracker
-  attr_reader :all, :progress
+  attr_reader :all, :progress, :names, :words
 
   def initialize(cgram_s)
     array = cgram_s.split_into_dataObjects
     @all = (array.map { |x| [x.name, x]}).to_h
+    @names = @all.select {|k,v| v.word_or_name == :name }
+    @words = @all.select {|k,v| v.word_or_name == :word }
     self.lookup_all_likely_words
   end
 
@@ -157,13 +160,21 @@ class GuessTracker < Tracker
     def gather_good_guesses(ctracker)
       a = letter_guesses(ctracker.l_t)
       b = word_guesses(ctracker.u_t)
+      guesses_to_add = b
+      guesses_to_add.each do |guess|
+        unless @all[guess.cryp_text]
+          @all[guess.cryp_text] = [guess]
+        else
+          @all.merge({guess.cryp_text => guess}){|key, oldv, newv| oldv << newv}
+        end
+      end
     end
 
     private
 
-    def word_guesses(wt)
+    def word_guesses(ut)
       guesses = []
-      wt.each do |word|
+      ut.all.values.each do |word|
         if word.solution
           next
         elsif word.likely_solutions
@@ -172,18 +183,20 @@ class GuessTracker < Tracker
           num_poss = 0
         end
         if num_poss < 6 && num_poss > 0
-          goodness_arr = GuessEval.goodness_by_freq(num_poss)
+          goodness_arr = GuessEval.goodness_by_freq(word.likely_solutions)
           word.likely_solutions.each_with_index do |x, index|
-            guesses << Guess.new(Equivalency.new(word.cryp_text, x), goodness_arr[index])
+            guesses << Guess.new(:word, word.cryp_text, x, goodness_arr[index])
           end
         end
       end
       return guesses
     end
 
-    def letter_guesses(wt, at)
+    def letter_guesses(ct)
     end
 
   end
+
+  include Generate
 
 end

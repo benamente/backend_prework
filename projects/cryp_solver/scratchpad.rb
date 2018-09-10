@@ -30,7 +30,7 @@ p thing.a
 cgram_s = "Q ATF'I RFTX CTX ZTW BOOE MYTWI TEA MPO... YWI QF SZ NMVO, Q AQAF'I OJOF VOO QI NTSQFP. QI CQI SO BHTS ICO HOMH. --GCZEEQV AQEEOH"
 t1 = CrypTracker.new(string: cgram_s)
 
-p t1.u_t.all["gczeeqv"]
 
 t1.u_t.print_with(atts:[:name, :x_string, :likely_solutions, :word_or_name])
 t1.l_t.print_with(atts:[:name, :locations])
+t1.g_t.print_with(atts:[:name])

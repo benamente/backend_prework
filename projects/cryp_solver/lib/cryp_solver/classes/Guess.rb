@@ -16,10 +16,11 @@ class Guess
 
   Equivalency = Struct.new(:word_or_letter, :crypt_text, :solution)
 
-  attr_accessor :goodness, :badness, :eq, :attempts, :tracker, :name, :adjusted_goodness
+  attr_accessor :goodness, :badness, :eq, :attempts, :tracker, :name, :adjusted_goodness, :cryp_text
   @@all_guesses = []
   def initialize(word_or_letter, cryp_text, solution, goodness)
     @eq = Equivalency.new(word_or_letter, cryp_text, solution)
+    @cryp_text = cryp_text
     @attempts = 0
     if @@all_guesses.list_attribute(:eq).include?(@eq)
       @attempts += 1
@@ -43,5 +44,5 @@ class Guess
 
 
 
-  
+
 end
