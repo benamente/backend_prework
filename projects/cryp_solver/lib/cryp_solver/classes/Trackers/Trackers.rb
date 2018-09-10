@@ -17,43 +17,61 @@ require "pp"
 
 
 class Tracker
+
+
   def print_with(hash={})
     atts = hash[:atts] || atts = []
     att_of_att = hash[:att_of_att] || att_of_att = {}
     limit = hash[:limit] || limit = 35
 
     self.all.values.each do |dataob|
-      atts.each_with_index do |att, i|
-        realat = dataob.public_send(att)
-        if realat.is_a? DataObject
-          print "#{realat.name.to_s}"
+      if dataob.is_a? Array
+        dataob.each do |real_dataob|
+          print_dataobject(real_dataob, atts, limit, array = true)
+          puts "-"
+        end
+      else
+
+        print_dataobject(dataob, atts, limit)
+        puts "-"
+
+      end
+    end
+  end
+
+  def print_dataobject(dataob, atts, limit, array = false)
+
+    atts.each_with_index do |att, i|
+      realat = dataob.public_send(att)
+      if realat.is_a? DataObject
+        print "#{realat.name.to_s}"
+      else
+        if realat.is_a? Array
+          printlist = realat.to_uncluttered_string_limited(limit)
+          print "#{printlist}"
+          max_length = limit + 3
+          num_spaces = max_length - printlist.length + 2
         else
-          if realat.is_a? Array
-            printlist = realat.to_uncluttered_string_limited(limit)
-            print "#{printlist}"
-            max_length = limit + 3
-            num_spaces = max_length - printlist.length + 2
-          else
-            print "#{realat.to_s}"
-            if realat.is_a?(String) || realat.is_a?(Symbol)
-              max_length = self.all.values.list_attribute(att, :to_s).max_attribute(:length)
-            elsif realat.is_a? Integer
+          print "#{realat.to_s}"
+          if realat.is_a?(String) || realat.is_a?(Symbol) || realat.is_a?(Integer)
+            if array == true
+              max_length = self.all.values.flatten.list_attribute(att, :to_s).max_attribute(:length)
+            else
               max_length = self.all.values.list_attribute(att, :to_s).max_attribute(:length)
             end
-            num_spaces = max_length - realat.length + 2
-            # print num_spaces
           end
+          num_spaces = max_length - realat.to_s.length + 2
+          # print num_spaces
         end
-        if i == 0
-          print ": "
-        elsif i < atts.length - 1
-          print "; "
-        end
-
-        print " " * num_spaces
-        #print "#{x.x_string.d}"
       end
-      puts "-"
+      if i == 0
+        print ": "
+      elsif i < atts.length - 1
+        print "; "
+      end
+
+      print " " * num_spaces
+      #print "#{x.x_string.d}"
     end
   end
 end
