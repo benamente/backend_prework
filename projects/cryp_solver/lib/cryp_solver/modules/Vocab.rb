@@ -53,6 +53,11 @@ class Vocab
   FREQ_TRIGRAPH = %w(the and tha ent ion tio for nde has nce tis oft men)
   FREQ_DOUBLE = %w(ss ee tt ff ll mm oo)
 
+  TWO_LETTER_WORDS = %w(of to in it is be as at so we he by or on do if me my up an go no us am)
+  TWO_LETTER_1 = TWO_LETTER_WORDS.map { |word| word[0]}.uniq
+  TWO_LETTER_2 = TWO_LETTER_WORDS.map { |word| word[1]}.uniq
+
+
 
 
 

@@ -83,9 +83,46 @@ end
 class LetterTracker < Tracker
   attr_accessor :all
 
-  def simplify_locs
-    @all.each do
-      x.fdsf
+  def symplify_locs
+    @all.values.each do |letterdata|
+      sym_locs = []
+      letterdata.locations.each do|location|
+        from_front = location[0]
+        from_back = location[1]
+        if from_front == 0
+          if from_back == -1
+            sym_locs << :loner
+          elsif from_back == -2
+            sym_locs << :one_of2
+          elsif from_back == -3
+            sym_locs << :one_of3
+          elsif from_back == -4
+            sym_locs << :one_of4
+          elsif from_back < -4
+            sym_locs << :first
+          end
+        elsif from_front == 1
+          if from_back == -1
+            sym_locs << :last_of2
+          elsif from_back == -2
+            sym_locs << :mid_of3
+          elsif from_back < -2
+            sym_locs << :second
+          end
+        elsif from_front == 2
+          if from_back == -1
+            sym_locs << :last_of3
+          elsif from_back == -2
+            sym_locs << :third
+          end
+        elsif from_back == -1
+          sym_locs << :last
+        else
+          sym_locs << :mid
+        end
+
+      end
+      letterdata.locations = sym_locs
     end
   end
 
@@ -93,7 +130,7 @@ class LetterTracker < Tracker
 
     array = string.split_into_dataObjects(by: :letter)
     @all = (array.map { |x| [x.name, x]}).to_h
-
+    symplify_locs
 
   end
 
@@ -200,10 +237,11 @@ class GuessTracker < Tracker
         else
           num_poss = 0
         end
-        if num_poss < 6 && num_poss > 0
+        if num_poss < 50 && num_poss > 0
           goodness_arr = GuessEval.goodness_by_freq(word.likely_solutions)
           word.likely_solutions.each_with_index do |x, index|
-            guesses << Guess.new(:word, word.cryp_text, x, goodness_arr[index])
+            new_guess = Guess.new(:word, word.cryp_text, x, goodness_arr[index])
+            guesses << new_guess if new_guess.goodness > 20
           end
         end
       end

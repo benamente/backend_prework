@@ -241,17 +241,18 @@ module DatableStrings
           else
             word_or_name = :word
           end
-        elsif by == :letter
-          space_ind = self.index(" ", index)
-          if !space_ind
-            space_ind = items.length + 1
-          end
-          if items.length > 2
-            front_loc = rel_location
-            back_loc = index - space_ind
-            location = [front_loc, back_loc]
-          end
+        end
+      end
 
+      if by == :letter
+        space_ind = self.index(" ", index)
+        if !space_ind
+          space_ind = items.length + 1
+        end
+        if items.length > 2
+          front_loc = rel_location
+          back_loc = index - space_ind
+          location = [front_loc, back_loc]
         end
       end
 

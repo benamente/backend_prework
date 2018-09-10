@@ -39,7 +39,16 @@ class LetterData < DataObject
     @prev_letter = info[:prev_letter]
   end
 
+  def freq_locs
+
+    freq_locations = []
+    locations.each do
+    end
+  end
+
+
 end
+
 
 class UnigramData < DataObject
   attr_accessor :cryp_text, :x_string, :likely_solutions, :solution, :progress
