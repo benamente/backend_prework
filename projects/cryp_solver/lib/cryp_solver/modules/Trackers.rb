@@ -1,4 +1,7 @@
-Dir["../../modules/basics/*.rb"].each {|file| require file }
+require "rubygems"
+require "require_all"
+
+require_rel "basics"
 
 require_relative "../../modules/Vocab.rb"
 require_relative "../../modules/XWordSearch.rb"
@@ -121,28 +124,28 @@ end
 
 
 
-  class UnigramTracker < Tracker
-    attr_reader :array, :progress
+class UnigramTracker < Tracker
+  attr_reader :array, :progress
 
-    def initialize(cgram_s)
-      @array = cgram_s.split_into_dataObjects
-      self.lookup_all_likely_words
+  def initialize(cgram_s)
+    @array = cgram_s.split_into_dataObjects
+    self.lookup_all_likely_words
+  end
+
+  def lookup_all_likely_words
+    self.array.each do |word|
+      word.lookup_likely_words
     end
-
-    def lookup_all_likely_words
-      self.array.each do |word|
-        word.lookup_likely_words
-      end
-    end
-
-
   end
 
 
+end
 
-  class GuessTracker < Tracker
-    attr_accessor :array
-    def initialize
-      @array = []
-    end
+
+
+class GuessTracker < Tracker
+  attr_accessor :array
+  def initialize
+    @array = []
   end
+end

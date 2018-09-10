@@ -1,8 +1,11 @@
-Dir["../modules/basics/*.rb"].each {|file| require file }
+require "rubygems"
+require "require_all"
+
+require_rel "basics"
 require_relative "XWordSearch.rb"
 require "yaml"
 
-module Vocab
+class Vocab
 
   def self.set_up_dict_array(file_with_one_column)
     arr = File.readlines(file_with_one_column, "r").join.split("\n")
@@ -19,21 +22,24 @@ module Vocab
     dictionary = arr.to_h
   end
 
+  this_folder = File.expand_path(__dir__)
 
-  DICTIONARY = self.set_up_dict_hash("./lib/word_lists/words_by_freq_with_pos.txt")
+
+  DICTIONARY = self.set_up_dict_hash(this_folder + "/../../word_lists/words_by_freq_with_pos.txt")
   NOUNS = DICTIONARY.select {|k,v| v == 'n'}.keys
-  PLURALS = YAML.load_file('./lib/word_lists/plurals.yml')
+  PLURALS = YAML.load_file(this_folder + '/../../word_lists/plurals.yml')
   VERBS = DICTIONARY.select {|k,v| v == 'v'}.keys
-  VERB_FORMS_HASH = YAML.load_file('./lib/word_lists/verb_forms.yml')
+  VERB_FORMS_HASH = YAML.load_file(this_folder + '/../../word_lists/verb_forms.yml')
   VERB_FORMS_ARRAY = VERB_FORMS_HASH.values
 
-  CONTRACTIONS = self.set_up_dict_hash("./lib/word_lists/contractions.txt")
+  CONTRACTIONS = self.set_up_dict_hash(this_folder + "/../../word_lists/contractions.txt")
   CONTRACTION_VERBS = CONTRACTIONS.select {|k,v| v == 'v'}.keys
 
   ALL_COMMON_WITH_PART_OF_SPEECH = DICTIONARY.merge(CONTRACTIONS)
 
-  COMMON_FORMS = DICTIONARY.keys + PLURALS.values + VERB_FORMS_HASH.values
-  SO_MANY_WORDS = set_up_dict_array("./lib/word_lists/big_list")
+  ALL_COMMON_FORMS = DICTIONARY.keys + PLURALS.values + VERB_FORMS_HASH.values
+  SO_MANY_WORDS = set_up_dict_array(this_folder + "/../../word_lists/big_list.txt")
+
 
 
 
