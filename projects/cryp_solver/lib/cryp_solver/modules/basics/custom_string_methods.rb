@@ -269,10 +269,10 @@ module DatableStrings
         when :word
           twin.abs_location.concat << index
           twin.rel_location << rel_location
-          twin.prev_word.concat << prev_item
+          twin.prev_word.concat << prev_item_s
         when :letter
           twin.locations << location
-          twin.prev_letter << prev_item
+          twin.prev_letter << prev_item_s
         end
         twin.freq += 1
       end

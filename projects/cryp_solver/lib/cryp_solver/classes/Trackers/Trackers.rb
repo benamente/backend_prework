@@ -67,7 +67,7 @@ class LetterTracker < Tracker
   def initialize(string)
 
     @array = string.split_into_dataObjects(by: :letter)
-
+     p @array
 
   end
 
