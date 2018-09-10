@@ -15,9 +15,8 @@ require_relative "lib/cryp_solver.rb"
 #
 # something()
 
-
-
-
+#
+#
 cgram_s = "Q ATF'I RFTX CTX ZTW BOOE MYTWI TEA MPO... YWI QF SZ NMVO, Q AQAF'I OJOF VOO QI NTSQFP. QI CQI SO BHTS ICO HOMH. --GCZEEQV AQEEOH"
 t1 = CrypTracker.new(string: cgram_s)
 

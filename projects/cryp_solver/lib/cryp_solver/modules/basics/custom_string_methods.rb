@@ -28,6 +28,10 @@ module UsefulStrings
     return wanted
   end
 
+  def delete_after(index)
+    self.slice(0..index)
+  end
+
   #returns true if there are any characters besides the ones listed in the argument
   def has_chars_besides?(*c)
     if self.delete(c.join).length > 0

@@ -12,6 +12,8 @@ require_relative "../modules/GuessEval.rb"
 
 class Guess
 
+  include GuessEval
+
   Equivalency = Struct.new(:word_or_letter, :crypt_text, :solution)
 
   attr_accessor :goodness, :badness, :eq, :attempts, :tracker, :name, :adjusted_goodness

@@ -1,4 +1,3 @@
-original = File.open("./lib/word_lists/words_by_freq_with_pos.txt", "r")
-new_file = File.new("./lib/word_lists/words_by_freq_with_pos2.txt", "w")
+require 'yaml'
 
-new_file.puts original.readlines.map {|x| x.downcase}
+original = File.open("textfile.txt", "r")

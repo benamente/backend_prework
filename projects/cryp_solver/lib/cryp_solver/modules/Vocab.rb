@@ -26,6 +26,7 @@ class Vocab
 
 
   DICTIONARY = self.set_up_dict_hash(this_folder + "/../../word_lists/words_by_freq_with_pos.txt")
+  WORDS_WITH_FREQ = YAML.load_file(this_folder + "/../../word_lists/words_with_freq.yaml")
   NOUNS = DICTIONARY.select {|k,v| v == 'n'}.keys
   PLURALS = YAML.load_file(this_folder + '/../../word_lists/plurals.yml')
   VERBS = DICTIONARY.select {|k,v| v == 'v'}.keys
@@ -56,7 +57,7 @@ class Vocab
 
 
   def self.get_replist(array)
-      return array.get_words_with_repeats.map{|x| x.include?("'") || x.include?("-") ? nil : x }.compact
+    return array.get_words_with_repeats.map{|x| x.include?("'") || x.include?("-") ? nil : x }.compact
   end
 
   def self.get_likely_wordlist_from_x_string(x_string, *solved_letters)
@@ -87,4 +88,56 @@ class Vocab
 
 
 
+end
+
+
+
+class String
+
+  def uncontract
+    if self == "won't"
+      return "will"
+    end
+    if self.include?("'")
+      bits = self.split("'")
+      bits.each do |bit|
+        if Vocab::DICTIONARY[bit]
+          return bit
+        end
+      end
+    end
+    if self.include?("n't")
+      return self.sub("n't", "")
+    end
+  end
+
+  def base
+    #does returns do
+    if Vocab::DICTIONARY[self]
+      return self
+    end
+    if ["'s", "s'"].include?(self[-2..-1])
+      return self.delete_after(-3)
+    end
+    word = Vocab::PLURALS[self]
+    return word if word
+    Vocab::VERB_FORMS_HASH.each do |key, values|
+      if values && values.include?(self)
+        return key.to_s
+      end
+    end
+    if Vocab::CONTRACTIONS.keys.include?(self)
+      return self.uncontract.base
+    end
+  end
+
+
+
+
+  def freq
+    freq = Vocab::WORDS_WITH_FREQ[self.base].to_i
+    return freq if freq
+    return 1
+
+  end
 end
