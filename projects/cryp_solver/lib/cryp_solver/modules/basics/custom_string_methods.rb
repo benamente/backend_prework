@@ -220,6 +220,10 @@ module DatableStrings
         sentence_type = info[:sentence_type] || sentence_type = nil
         proper = info[:proper] || proper = proper
         attribution = info[:attribution] || attribution = 0
+        if index == 0
+          word_or_name = :word
+        end
+
       end
 
       punct = item.delete_and_return("-?;:,.!()")
@@ -231,6 +235,11 @@ module DatableStrings
           #prev_end = storarray.return_object_with("abs_location", [index - 1])
           if prev_item && prev_item.rel_location[-1] == :end
             rel_location = 0
+          end
+          if prev_item.attribution && attribution > 60 || prev_item.attribution[-1] > 60
+            word_or_name = :name
+          else
+            word_or_name = :word
           end
         elsif by == :letter
           space_ind = self.index(" ", index)
@@ -263,7 +272,7 @@ module DatableStrings
       if seen_before == false
         case by
         when :word
-          storarray << WordData.new(cryp_text, x_string: x_string, abs_location: index, rel_location: rel_location, prev_word: prev_item_s)
+          storarray << WordData.new(cryp_text, x_string: x_string, abs_location: index, rel_location: rel_location, prev_word: prev_item_s, attribution: attribution, word_or_name: word_or_name)
         when :letter
           storarray << LetterData.new(cryp_text, locations: [location], prev_letter: [prev_item_s])
         end

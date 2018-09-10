@@ -43,45 +43,5 @@ class Guess
 
 
 
-  module Generate
-
-    def self.suggest_guesses(ctracker)
-      a = letter_guesses(ctracker.letter_tracker)
-      b = word_guesses(ctracker.word_tracker)
-      if !a
-        return b
-      elsif !b
-        return a
-      else
-        return a + b
-      end
-    end
-
-    private
-
-    def word_guesses(wt)
-      guesses = []
-      wt.each do |word|
-        if word.solution
-          next
-        elsif word.likely_solutions
-          num_poss = word.likely_solutions.length
-        else
-          num_poss = 0
-        end
-        if num_poss < 6 && num_poss > 0
-          goodness_arr = GuessEval.goodness(num_poss)
-          word.likely_solutions.each_with_index do |x, index|
-            guesses << Guess.new(Equivalency.new(word.cryp_text, x), goodness_arr[index])
-          end
-        end
-      end
-      return guesses
-    end
-
-    def letter_guesses(wt, at)
-    end
-
-  end
-
+  
 end

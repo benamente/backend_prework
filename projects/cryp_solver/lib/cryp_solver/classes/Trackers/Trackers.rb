@@ -35,12 +35,13 @@ class Tracker
             num_spaces = max_length - printlist.length + 2
           else
             print "#{realat.to_s}"
-            if realat.is_a? String
+            if realat.is_a?(String) || realat.is_a?(Symbol)
               max_length = self.all.values.list_attribute(att, :to_s).max_attribute(:length)
             elsif realat.is_a? Integer
               max_length = self.all.values.list_attribute(att, :to_s).max_attribute(:length)
             end
-            num_spaces = max_length - dataob.name.length + 2
+            num_spaces = max_length - realat.length + 2
+            # print num_spaces
           end
         end
         if i == 0
@@ -147,6 +148,42 @@ end
 class GuessTracker < Tracker
   attr_accessor :all
   def initialize
-    @array = []
+    @all = {}
   end
+
+
+  module Generate
+
+    def gather_good_guesses(ctracker)
+      a = letter_guesses(ctracker.l_t)
+      b = word_guesses(ctracker.u_t)
+    end
+
+    private
+
+    def word_guesses(wt)
+      guesses = []
+      wt.each do |word|
+        if word.solution
+          next
+        elsif word.likely_solutions
+          num_poss = word.likely_solutions.length
+        else
+          num_poss = 0
+        end
+        if num_poss < 6 && num_poss > 0
+          goodness_arr = GuessEval.goodness_by_freq(num_poss)
+          word.likely_solutions.each_with_index do |x, index|
+            guesses << Guess.new(Equivalency.new(word.cryp_text, x), goodness_arr[index])
+          end
+        end
+      end
+      return guesses
+    end
+
+    def letter_guesses(wt, at)
+    end
+
+  end
+
 end

@@ -45,7 +45,8 @@ class UnigramData < DataObject
   attr_accessor :cryp_text, :x_string, :likely_solutions, :solution, :progress
   attr_accessor :parts_of_speech_not,  :parts_of_speech_likely, :part_of_speech
   attr_accessor :abs_location, :rel_location, :punctuation, :freq, :name, :commonness
-  attr_accessor :length, :prev_word, :next_word, :word_or_name
+  attr_accessor :length, :prev_word, :next_word, :word_or_name, :attribution
+
 end
 
 class WordData < UnigramData
@@ -59,6 +60,8 @@ class WordData < UnigramData
     @abs_location = [hash[:abs_location]]
     @rel_location = [hash[:rel_location]]
     @prev_word = [hash[:prev_word]]
+    @attribution = [hash[:attribution]]
+    @word_or_name = hash[:word_or_name]
     @parts_of_speech_not = []
     @parts_of_speech_likely = []
   end
@@ -84,7 +87,11 @@ class WordData < UnigramData
   end
 
   def lookup_likely_words
-    @likely_solutions = Vocab.get_likely_wordlist_from_x_string(x_string)
+    if self.word_or_name == :word
+      @likely_solutions = Vocab.get_likely_wordlist_from_x_string(x_string)
+    else
+      @likely_solutions = []
+    end
   end
 
 end
@@ -94,14 +101,3 @@ class PronounData < UnigramData
 
 
 end
-
-
-
-
-
-
-
-
-
-
-  
