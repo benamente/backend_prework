@@ -42,6 +42,16 @@ class Vocab
   SO_MANY_WORDS = set_up_dict_array(this_folder + "/../../word_lists/big_list.txt")
 
 
+  # 
+  # FEMALE_NAMES = set_up_dict_hash(this_folder + "/../../wordlists/female_names_with_pf.txt")
+  # MALE_NAMES = set_up_dict_hash(this_folder + "/../../wordlists/male_names_with_pf.txt")
+  # SURNAMES = set_up_dict_hash(this_folder + "/../../wordlists/surnames_with_pf.txt")
+  #
+  # ALL_NAMES = FEMALE_NAMES.merge(MALE_NAMES) {|key, oldval, newval| oldval > newval ? oldval : newval}.merge(SURNAMES) {|key, oldval, newval| oldval > newval ? oldval : newval}.
+  #
+  #
+  #
+  # p ALL_NAMES["Charles"]
 
 
   FREQ_FIRST_LETTER = %w(t o a w b c d s f m r h i y e g l n p u j k)

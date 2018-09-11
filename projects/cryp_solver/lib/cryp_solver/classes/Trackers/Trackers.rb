@@ -246,6 +246,7 @@ class CrypTracker < Tracker
     def implement(guess)
       apply_eq(guess.eq)
       update_likely_words
+      g_t.gather_good_guesses(self)
     end
 
   end
@@ -300,6 +301,7 @@ class GuessTracker < Tracker
   module Generate
 
     def gather_good_guesses(ctracker)
+      @all = {}
       a = letter_guesses(ctracker.l_t)
       b = get_word_guesses(ctracker)
       guesses_to_add = b
@@ -332,6 +334,7 @@ class GuessTracker < Tracker
           goodness_arr = GuessEval.goodness_by_freq(word.likely_solutions)
           word.likely_solutions.each_with_index do |x, index|
             new_guess = Guess.new(:word, word.cryp_text, x, goodness_arr[index])
+            binding.pry if new_guess.goodness == nil
             guesses << new_guess if new_guess.goodness > 20
           end
         end

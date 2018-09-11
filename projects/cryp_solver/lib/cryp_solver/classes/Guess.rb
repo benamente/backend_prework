@@ -23,15 +23,15 @@ class Guess
     @cryp_text = cryp_text
     @attempts = 0
     @solution = solution
-    if @@all_guesses.list_attribute(:eq).include?(@eq)
-      @attempts += 1
-    else
+    # if @@all_guesses.list_attribute(:eq).include?(@eq)
+    # #   @attempts += 1
+    # else
       @goodness = goodness
       @badness = 0
       @adjusted_goodness = goodness - badness
       @@all_guesses << self
       @name = eq.solution.to_s
-    end
+    # end
   end
 
 
