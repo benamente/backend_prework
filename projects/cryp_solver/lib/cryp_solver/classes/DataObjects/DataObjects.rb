@@ -1,7 +1,7 @@
 require_relative "../../modules/Vocab.rb"
 require_relative "../../modules/Grammar.rb"
 require_rel "../Trackers"
-
+require "pry"
 
 
 class DataObject
@@ -29,7 +29,7 @@ end
 
 class LetterData < DataObject
   attr_accessor :cryp_text, :name, :locations, :prev_letter, :next_letter
-  attr_accessor :solution, :likely_solutions, :likely_not, :freq
+  attr_accessor :solution, :likely_solutions, :likely_not, :freq, :perc_freq
 
   def initialize(cryp_text, info={})
     @freq = 1
@@ -37,14 +37,21 @@ class LetterData < DataObject
     @cryp_text = cryp_text
     @locations = info[:locations]
     @prev_letter = info[:prev_letter]
+    @likely_not = []
   end
 
   def freq_locs
 
-    freq_locations = []
-    locations.each do
+    locations_with_freq = {}
+    locations.each do |location|
+      locations_with_freq.merge!({location => 1}) {|key, oldval, newval| oldval + newval}
     end
+
+    return locations_with_freq.select{|k,v| v > 1}
+
   end
+
+
 
 
 end

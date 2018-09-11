@@ -37,6 +37,7 @@ class Tracker
 
       end
     end
+
   end
 
   def print_dataobject(dataob, atts, limit, array = false)
@@ -46,22 +47,22 @@ class Tracker
       if realat.is_a? DataObject
         print "#{realat.name.to_s}"
       else
-        if realat.is_a? Array
+        if realat.is_a?(Array) || realat.is_a?(Hash)
           printlist = realat.to_uncluttered_string_limited(limit)
           print "#{printlist}"
           max_length = limit + 3
           num_spaces = max_length - printlist.length + 2
         else
           print "#{realat.to_s}"
-          if realat.is_a?(String) || realat.is_a?(Symbol) || realat.is_a?(Integer)
+          if [String, Symbol, Integer, Float, NilClass].include?(realat.class)
             if array == true
               max_length = self.all.values.flatten.list_attribute(att, :to_s).max_attribute(:length)
             else
               max_length = self.all.values.list_attribute(att, :to_s).max_attribute(:length)
             end
           end
+
           num_spaces = max_length - realat.to_s.length + 2
-          # print num_spaces
         end
       end
       if i == 0
@@ -120,9 +121,22 @@ class LetterTracker < Tracker
         else
           sym_locs << :mid
         end
-
       end
+
       letterdata.locations = sym_locs
+    end
+  end
+
+  def letter_count
+
+    return @all.values.list_attribute(:freq).inject do |sum, n|
+      n + sum
+    end
+  end
+
+  def set_perc_freqs(lc)
+    @all.values.each do |letterdata|
+      letterdata.perc_freq = 10000 * letterdata.freq / lc / 100.0
     end
   end
 
@@ -131,10 +145,33 @@ class LetterTracker < Tracker
     array = string.split_into_dataObjects(by: :letter)
     @all = (array.map { |x| [x.name, x]}).to_h
     symplify_locs
-
+    set_perc_freqs(letter_count)
+    tlw_smarts
   end
 
 
+
+
+
+
+
+
+  module LetterSmarts
+    #two_letter_word_smarts
+    def tlw_smarts
+      @all.values.each do |letterdata|
+        if letterdata.freq_locs.include?(:one_of2)
+          letterdata.likely_not += ("a".."z").to_a - Vocab::TWO_LETTER_1
+
+        end
+        if letterdata.freq_locs.include?(:last_of2)
+          letterdata.likely_not += ("a".."z").to_a - Vocab::TWO_LETTER_2
+        end
+      end
+    end
+  end
+
+  include LetterSmarts
 end
 
 
@@ -167,6 +204,32 @@ class CrypTracker < Tracker
     end
 
   end
+
+  def apply_eq(equiv)
+    case equiv.word_or_letter
+    when :word
+      equiv.cryp_text.chars.each_with_index do |char, i|
+        apply_eq(Equivalency.new(word_or_letter: :letter, cryp_text: char, solution: equiv.solution[i]))
+      end
+    when :letter
+      l_t.all[equiv.cryp_text].solution = equiv.solution
+      u_t.all.keys.each do |worddata|
+        inds = worddata.cryp_text.get_indices_of_letter(equiv.cryp_text)
+        worddata.x_string.insert_at_indices(equiv.solution, inds)
+      end
+    end
+  end
+
+  module Cryp_solver
+    def implement_best_guess
+      implement(GuessEval.best_guess)
+    end
+    def implement(guess)
+      apply_eq(guess.eq)
+    end
+
+  end
+
 
 
 end
