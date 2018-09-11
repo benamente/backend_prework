@@ -8,8 +8,19 @@ require_rel "basics"
 
 module XWordSearch
 
-  #given a string such as "hXlX" will return an array of all likely words, X's representing any character
 
+  #returns true if for both words (should be same length), the given letter is
+  #in the same positions
+  def letter_same_for_both?(w1, w2, c)
+    if w1.get_indices_of_letter(c) == w2.get_indices_of_letter(c)
+      return true
+    else
+      return false
+    end
+  end
+
+
+  #given a string such as "hXlX" will return an array of all likely words, X's representing any character
   def self.match_likely_words(x_string, arr_of_words, *solved_letters)
 
     likely_words = arr_of_words.select{|word| x_string.length == word.length}
@@ -31,6 +42,7 @@ module XWordSearch
 
   end
 
+  private
   #retuns words where the solved letters are present and in the right places
   def self.match_likely_with_solved_letters(x_string, likely_words, *solved_letters)
     x_string_solved_letters = x_string.chars.reject{|char| char.is_upper?}.uniq
@@ -81,19 +93,10 @@ module XWordSearch
     end
 
 
-    #returns true if for both words (should be same length), the given letter is
-    #in the same positions
-    def letter_same_for_both?(w1, w2, c)
-      if w1.get_indices_of_letter(c) == w2.get_indices_of_letter(c)
-        return true
-      else
-        return false
-      end
-    end
 
     #cows isn't in our dictionary that returns with POS, but cow is. Given cows,
     #it will return a similar word that's in the dictionary: cow. If asked, it will also return
     #what made cows different from cow, ie it was plural.
-  
+
 
   end

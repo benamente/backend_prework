@@ -1,5 +1,7 @@
 require_relative "../../modules/Vocab.rb"
 require_relative "../../modules/Grammar.rb"
+require_relative "../../modules/XWordSearch.rb"
+
 require_rel "../Trackers"
 require "pry"
 
@@ -38,6 +40,7 @@ class LetterData < DataObject
     @locations = info[:locations]
     @prev_letter = info[:prev_letter]
     @likely_not = []
+    @solution = nil
   end
 
   def freq_locs
@@ -109,6 +112,15 @@ class WordData < UnigramData
       @likely_solutions = []
     end
   end
+
+  def update_likely_words(solved_letters)
+    if self.word_or_name == :word
+      @likely_solutions = XWordSearch.match_likely_words(self.x_string, @likely_solutions, *solved_letters)
+    else
+      @likely_solutions = []
+    end
+  end
+
 
 end
 

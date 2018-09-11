@@ -149,6 +149,10 @@ class LetterTracker < Tracker
     tlw_smarts
   end
 
+  def letter_solutions
+    @all.values.list_attribute(:solution).compact
+  end
+
 
 
 
@@ -206,33 +210,50 @@ class CrypTracker < Tracker
   end
 
   def apply_eq(equiv)
+
     case equiv.word_or_letter
     when :word
+
       equiv.cryp_text.chars.each_with_index do |char, i|
-        apply_eq(Equivalency.new(word_or_letter: :letter, cryp_text: char, solution: equiv.solution[i]))
+        apply_eq(Equivalency.new(char, equiv.solution[i], :letter)) unless char == "'"
       end
     when :letter
       l_t.all[equiv.cryp_text].solution = equiv.solution
-      u_t.all.keys.each do |worddata|
+      u_t.all.values.each do |worddata|
         inds = worddata.cryp_text.get_indices_of_letter(equiv.cryp_text)
-        worddata.x_string.insert_at_indices(equiv.solution, inds)
+        worddata.x_string = worddata.x_string.insert_at_indices(equiv.solution, inds)
       end
     end
   end
 
-  module Cryp_solver
-    def implement_best_guess
-      implement(GuessEval.best_guess)
-    end
-    def implement(guess)
-      apply_eq(guess.eq)
-    end
 
+  def update_likely_words
+    u_t.all.values.each do |word|
+      word.update_likely_words(l_t.letter_solutions)
+      word.sync_progress
+    end
+  end
+
+  def update_guesses
+    @g_t.gather_good_guesses(self)
   end
 
 
+  module CrypSolver
+    def implement_best_guess
+      implement(g_t.best_guess)
+    end
+    def implement(guess)
+      apply_eq(guess.eq)
+      update_likely_words
+    end
+
+  end
+  include CrypSolver
 
 end
+
+
 
 
 
@@ -262,6 +283,8 @@ class UnigramTracker < Tracker
   end
 
 
+
+
 end
 
 
@@ -270,6 +293,7 @@ class GuessTracker < Tracker
   attr_accessor :all
   def initialize
     @all = {}
+    @literally_all
   end
 
 
@@ -277,7 +301,7 @@ class GuessTracker < Tracker
 
     def gather_good_guesses(ctracker)
       a = letter_guesses(ctracker.l_t)
-      b = word_guesses(ctracker.u_t)
+      b = get_word_guesses(ctracker)
       guesses_to_add = b
       guesses_to_add.each do |guess|
         unless @all[guess.cryp_text]
@@ -286,6 +310,10 @@ class GuessTracker < Tracker
           @all.merge({guess.cryp_text => guess}){|key, oldv, newv| oldv << newv}
         end
       end
+    end
+
+    def get_word_guesses(ctracker)
+      b = word_guesses(ctracker.u_t)
     end
 
     private
@@ -316,6 +344,7 @@ class GuessTracker < Tracker
 
   end
 
+  include GuessEval
   include Generate
 
 end

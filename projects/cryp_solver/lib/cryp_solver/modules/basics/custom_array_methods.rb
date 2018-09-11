@@ -25,7 +25,7 @@ module UsefulArrays
 
   def return_object_with(attribute, value)
 
-    self.each do |x|
+    self.flatten.each do |x|
       if x.public_send(attribute) == value
         return x
       end
@@ -35,7 +35,9 @@ module UsefulArrays
 
   def return_objects_with(attribute, value)
     new_arr = []
-    self.each do |x|
+    self.flatten.each do |x|
+      # binding.pry if x.is_a?(Array)
+
       if x.public_send(attribute) == value
         new_arr << x
       end
