@@ -110,9 +110,24 @@ module UsefulStrings
     return false
   end
 
+# if string has no 'a', will return 'a', if it has an 'a' but no 'b', will return 'b'. Has "ab", but no c? C is returned. And so on.
+  def next_available_char
+    ('a'..'z').each do |char|
+      unless self.downcase.include?(char)
+        return char
+      end
+    end
+  end
+
   #takes a word with repeat letters and replaces all non-repeat letters with X's. Upcases others.
+  #debugged so when a string has a repeating x in it, the x is replaced so the data isn't lost
   def x_out_nonrepeaters
-    return self.x_out_except(self.get_repeater_chars, "'").upcase
+    if self.downcase.include?('x')
+      x_safe = self.gsub('x', self.next_available_char)
+    else
+      x_safe = self
+    end
+    return x_safe.x_out_except(x_safe.get_repeater_chars, "'").upcase
   end
 
   #returns list of indices (as array (or nested arrays if multiple repeating characters)) of characters that repeat
@@ -236,6 +251,7 @@ module DatableStrings
           if prev_item && prev_item.rel_location[-1] == :end
             rel_location = 0
           end
+
           if prev_item.attribution && attribution > 60 || prev_item.attribution[-1] > 60
             word_or_name = :name
           else

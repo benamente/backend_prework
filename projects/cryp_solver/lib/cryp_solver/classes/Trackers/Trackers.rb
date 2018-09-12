@@ -335,7 +335,7 @@ class GuessTracker < Tracker
           word.likely_solutions.each_with_index do |x, index|
             new_guess = Guess.new(:word, word.cryp_text, x, goodness_arr[index])
             binding.pry if new_guess.goodness == nil
-            guesses << new_guess if new_guess.goodness > 20
+            guesses << new_guess if new_guess.goodness > 49
           end
         end
       end
