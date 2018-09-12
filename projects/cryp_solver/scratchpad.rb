@@ -19,13 +19,16 @@ require_relative "lib/cryp_solver.rb"
 #
 
 
-cgram_s = "Q ATF'I RFTX CTX ZTW BOOE MYTWI TEA MPO... YWI QF SZ NMVO, Q AQAF'I OJOF VOO QI NTSQFP. QI CQI SO BHTS ICO HOMH. --GCZEEQV AQEEOH"
+ cgram_s = "Q ATF'I RFTX CTX ZTW BOOE MYTWI TEA MPO... YWI QF SZ NMVO, Q AQAF'I OJOF VOO QI NTSQFP. QI CQI SO BHTS ICO HOMH. --GCZEEQV AQEEOH"
+ # cgram_s = "QKFX FX Z QEXQ ID QKE EAERCENWV ZGERQ XVXQEA. QKFX FX INGV Z QEXQ."
 t1 = CrypTracker.new(string: cgram_s)
-
-
+#
+count = 1
 loop do
   t1.implement_best_guess
   break if t1.g_t.all == {}
+  # break if count == 1
+  count +=1
 end
 t1.u_t.print_with(atts:[:name, :x_string, :likely_solutions, :word_or_name])
 t1.l_t.print_with(atts:[:name, :perc_freq, :freq, :likely_not], limit: 50)

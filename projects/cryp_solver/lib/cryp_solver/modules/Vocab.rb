@@ -31,28 +31,26 @@ class Vocab
   PLURALS = YAML.load_file(this_folder + '/../../word_lists/plurals.yml')
   VERBS = DICTIONARY.select {|k,v| v == 'v'}.keys
   VERB_FORMS_HASH = YAML.load_file(this_folder + '/../../word_lists/verb_forms.yml')
-  VERB_FORMS_ARRAY = VERB_FORMS_HASH.values
+  VERB_FORMS_ARRAY = VERB_FORMS_HASH.values.flatten.compact
 
   CONTRACTIONS = self.set_up_dict_hash(this_folder + "/../../word_lists/contractions.txt")
   CONTRACTION_VERBS = CONTRACTIONS.select {|k,v| v == 'v'}.keys
 
   ALL_COMMON_WITH_PART_OF_SPEECH = DICTIONARY.merge(CONTRACTIONS)
 
-  ALL_COMMON_FORMS = DICTIONARY.keys + PLURALS.values + VERB_FORMS_HASH.values
+  ALL_COMMON_FORMS = DICTIONARY.keys + PLURALS.values + VERB_FORMS_ARRAY
   SO_MANY_WORDS = set_up_dict_array(this_folder + "/../../word_lists/big_list.txt")
 
 
-  # 
-  # FEMALE_NAMES = set_up_dict_hash(this_folder + "/../../wordlists/female_names_with_pf.txt")
-  # MALE_NAMES = set_up_dict_hash(this_folder + "/../../wordlists/male_names_with_pf.txt")
-  # SURNAMES = set_up_dict_hash(this_folder + "/../../wordlists/surnames_with_pf.txt")
   #
-  # ALL_NAMES = FEMALE_NAMES.merge(MALE_NAMES) {|key, oldval, newval| oldval > newval ? oldval : newval}.merge(SURNAMES) {|key, oldval, newval| oldval > newval ? oldval : newval}.
-  #
-  #
-  #
-  # p ALL_NAMES["Charles"]
+  FEMALE_NAMES = set_up_dict_hash(this_folder + "/../../word_lists/female_names_with_pf.txt")
+  MALE_NAMES = set_up_dict_hash(this_folder + "/../../word_lists/male_names_with_pf.txt")
+  SURNAMES = YAML.load_file(this_folder + "/../../word_lists/surnames_with_pf.yml")
+  #  sum = 180904837
 
+  ALL_NAMES = FEMALE_NAMES.merge(MALE_NAMES) {|key, oldval, newval| oldval.to_f > newval.to_f ? oldval : newval}.merge(SURNAMES) {|key, oldval, newval| oldval.to_f > newval.to_f ? oldval : newval}
+
+  #
 
   FREQ_FIRST_LETTER = %w(t o a w b c d s f m r h i y e g l n p u j k)
   FREQ_SECOND_LETTER = %w(h o e i a u n r t)
@@ -77,7 +75,9 @@ LETTER_FREQ_PERC = {a: 8.17, b: 1.49, c: 2.78, d: 4.25, e: 12.70, f: 2.23, g: 2.
     return array.get_words_with_repeats.map{|x| x.include?("'") || x.include?("-") ? nil : x }.compact
   end
 
-  def self.get_likely_wordlist_from_x_string(x_string, *solved_letters)
+  def self.get_likely_wordlist_from_x_string(x_string, options = {})
+    solved_letters = options[:solved_letters] || []
+    word_list = options[:word_list] || Vocab::ALL_COMMON_FORMS
     #Deals with words with apostrophes be they contractions or...
     #puts "\n\n\nHERE\n\n\n" if x_string = "AiAX'X"
 
@@ -91,16 +91,22 @@ LETTER_FREQ_PERC = {a: 8.17, b: 1.49, c: 2.78, d: 4.25, e: 12.70, f: 2.23, g: 2.
       end
 
     else
-      poss = XWordSearch.match_likely_words(x_string, Vocab::DICTIONARY.keys, *solved_letters)
+      poss = XWordSearch.match_likely_words(x_string, Vocab::ALL_COMMON_FORMS, *solved_letters)
 
     end
     if poss
       if poss.length == 0
-        wordlist = "NONE FOUND"
+        likelylist = "NONE FOUND"
       else
-        wordlist = poss
+        likelylist = poss
       end
     end
+  end
+
+  def self.name_search(x_string)
+     XWordSearch.match_likely_words(x_string, Vocab::ALL_NAMES.keys)
+
+
   end
 
 
@@ -151,10 +157,16 @@ class String
 
 
 
-  def freq
-    freq = Vocab::WORDS_WITH_FREQ[self.base].to_i
+  def freq(options = {})
+    w_n = options[:word_or_name] || :word
+    case w_n
+    when :word
+      freq = Vocab::WORDS_WITH_FREQ[self.base].to_i
+    when :name
+      freq = Vocab::ALL_NAMES[self.upcase].to_f
+    end
     return freq if freq
-    return 1
+    return 0
 
   end
 end

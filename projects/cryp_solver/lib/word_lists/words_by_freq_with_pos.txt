@@ -3885,6 +3885,7 @@ donor	n
 hers	p
 pastor	n
 jazz	n
+alert n
 opera	n
 japanese	n
 bite	n

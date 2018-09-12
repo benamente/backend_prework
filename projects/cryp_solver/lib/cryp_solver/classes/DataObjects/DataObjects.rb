@@ -106,19 +106,16 @@ class WordData < UnigramData
   end
 
   def lookup_likely_words
-    if self.word_or_name == :word
+    case self.word_or_name
+    when :word
       @likely_solutions = Vocab.get_likely_wordlist_from_x_string(x_string)
-    else
-      @likely_solutions = []
+    when :name
+      @likely_solutions =  Vocab.name_search(x_string)
     end
   end
 
   def update_likely_words(solved_letters)
-    if self.word_or_name == :word
       @likely_solutions = XWordSearch.match_likely_words(self.x_string, @likely_solutions, *solved_letters)
-    else
-      @likely_solutions = []
-    end
   end
 
 

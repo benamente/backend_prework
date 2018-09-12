@@ -1,5 +1,7 @@
 require "./lib/cryp_solver.rb"
 
+puts "Enter Text:"
+
 alphabet = ("a".."z").to_a
 cipherbet = alphabet.clone.shuffle
 cipher = alphabet.zip(cipherbet).to_h

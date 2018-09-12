@@ -331,7 +331,7 @@ class GuessTracker < Tracker
           num_poss = 0
         end
         if num_poss < 50 && num_poss > 0
-          goodness_arr = GuessEval.goodness_by_freq(word.likely_solutions)
+          goodness_arr = GuessEval.goodness_by_freq(word.likely_solutions, word_or_name: word.word_or_name)
           word.likely_solutions.each_with_index do |x, index|
             new_guess = Guess.new(:word, word.cryp_text, x, goodness_arr[index])
             binding.pry if new_guess.goodness == nil
