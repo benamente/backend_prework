@@ -192,6 +192,17 @@ end
 
 module DatableStrings
 
+  def find_prev_item_string(storarray, items, index, number_back = 0)
+    prev_item_s = items[index - 1 - number_back]
+    if prev_item_s == ""
+      number_back += 1
+      prev_item_s = find_prev_item_string(storarray, items, index, number_back)
+    end
+    # binding.pry if index == 45
+
+    return prev_item_s
+  end
+
   def split_into_dataObjects (options = {})
 
     if self.include?(" ")
@@ -199,26 +210,17 @@ module DatableStrings
     else
       default = :letter
     end
-
     by = options[:by] || by = default
-
     if by == :word
       items = self.downcase.split(/ /)
       proper = false
     elsif by == :letter
       items = self.downcase.chars
     end
-
-
-
     storarray = []
     prev_item = nil
     rel_location = 0
     items.each_with_index do |item, index|
-      # if by == :letter
-      #   puts "top" + storarray.inspect
-      # end
-
       if by == :letter
         if item == " "
           rel_location = 0
@@ -227,8 +229,6 @@ module DatableStrings
           next
         end
       end
-
-
       if by == :word
         info = Grammar.get_info_from_punc_on_word(item, prev_word: prev_item)
         rel_location = info[:rel_location] || rel_location = rel_location
@@ -238,20 +238,21 @@ module DatableStrings
         if index == 0
           word_or_name = :word
         end
-
       end
-
       punct = item.delete_and_return("-?;:,.!()")
-
+      if item == ""
+        next
+      end
       if index > 0
-        prev_item_s = items[index - 1]
+
+        prev_item_s = find_prev_item_string(storarray, items, index)
         prev_item = storarray.return_object_with(:cryp_text, prev_item_s)
+
         if by == :word
           #prev_end = storarray.return_object_with("abs_location", [index - 1])
           if prev_item && prev_item.rel_location[-1] == :end
             rel_location = 0
           end
-
           if prev_item.attribution && attribution > 60 || prev_item.attribution[-1] > 60
             word_or_name = :name
           else
@@ -271,8 +272,6 @@ module DatableStrings
           location = [front_loc, back_loc]
         end
       end
-
-
 
       cryp_text = item.clone
 
@@ -310,9 +309,6 @@ module DatableStrings
       if rel_location.is_a? Integer
         rel_location += 1
       end
-      # if by == :letter
-      #   puts "bottom" + storarray.inspect
-      # end
     end
 
     return storarray

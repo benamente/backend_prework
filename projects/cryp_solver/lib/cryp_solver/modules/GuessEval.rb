@@ -19,6 +19,8 @@ module GuessEval
       return [0] * arr_of_strings.length
     end
     arr_of_goodness = arr_of_freq.map {|num| 100 * num/freq_sum}
+    # binding.pry if arr_of_strings.include?("fears")
+    return arr_of_goodness
   end
 
 

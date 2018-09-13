@@ -84,6 +84,10 @@ end
 class LetterTracker < Tracker
   attr_accessor :all
 
+  def cipher
+    @all.map{ |k, v| [k, v.solution]}.to_h
+  end
+
   def symplify_locs
     @all.values.each do |letterdata|
       sym_locs = []
@@ -152,6 +156,8 @@ class LetterTracker < Tracker
   def letter_solutions
     @all.values.list_attribute(:solution).compact
   end
+
+
 
 
 
@@ -236,6 +242,12 @@ class CrypTracker < Tracker
 
   def update_guesses
     @g_t.gather_good_guesses(self)
+  end
+
+  def solution
+    binding.pry
+    original_string.chars.map { |char| l_t.all[char]}
+
   end
 
 
@@ -335,7 +347,7 @@ class GuessTracker < Tracker
           word.likely_solutions.each_with_index do |x, index|
             new_guess = Guess.new(:word, word.cryp_text, x, goodness_arr[index])
             binding.pry if new_guess.goodness == nil
-            guesses << new_guess if new_guess.goodness > 49
+            guesses << new_guess if new_guess.goodness > 20
           end
         end
       end

@@ -96,7 +96,7 @@ LETTER_FREQ_PERC = {a: 8.17, b: 1.49, c: 2.78, d: 4.25, e: 12.70, f: 2.23, g: 2.
     end
     if poss
       if poss.length == 0
-        likelylist = "NONE FOUND"
+        likelylist = []
       else
         likelylist = poss
       end
@@ -142,7 +142,7 @@ class String
     if ["'s", "s'"].include?(self[-2..-1])
       return self.delete_after(-3)
     end
-    word = Vocab::PLURALS[self]
+    word = Vocab::PLURALS.key(self)
     return word if word
     Vocab::VERB_FORMS_HASH.each do |key, values|
       if values && values.include?(self)
