@@ -18,7 +18,7 @@ module Grammar
     if word_or_word_tracker.is_a? WordData
       word = word_or_word_tracker
       word.prev_word_ob.each do |pw|
-        if pw && pw.solution && pw.solution.part_of_speech == "p"
+        if pw && pw.solution && pw.solution.part_of_speech.include?("p")
           ["n","p","j"].each do |z|
             word.parts_of_speech_not << Probability.new(z, 98)
           end

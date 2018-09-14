@@ -1,5 +1,8 @@
 require "rubygems"
 require "require_all"
+require "verbs"
+require "pry"
+require 'active_support/inflector'
 
 require_rel "basics"
 require_relative "XWordSearch.rb"
@@ -13,24 +16,35 @@ class Vocab
     return arr
   end
 
-  def self.set_up_dict_hash(file_with_two_columns)
+  def self.set_up_dict_hash(file_with_two_columns, options ={})
+    mult_values = options[mult_values] || :on
     arr = set_up_dict_array(file_with_two_columns)
     arr.map! do |x|
       #x.split("\t")
-      x.split(" ")
+      x.downcase.split(" ")
     end
-    dictionary = arr.to_h
+    case mult_values
+    when :on
+      return arr.group_by(&:first).map {|k,v|[k,v.map(&:last)]}.to_h
+    when :off
+      return arr.to_h
+    end
+    # next step, everytime where it expects a string make it handle array
+    # step after that, have it fix the freq of words with multiple pos
   end
 
   this_folder = File.expand_path(__dir__)
 
 
   DICTIONARY = self.set_up_dict_hash(this_folder + "/../../word_lists/words_by_freq_with_pos.txt")
-  WORDS_WITH_FREQ = YAML.load_file(this_folder + "/../../word_lists/words_with_freq.yaml")
-  NOUNS = DICTIONARY.select {|k,v| v == 'n'}.keys
-  PLURALS = YAML.load_file(this_folder + '/../../word_lists/plurals.yml')
-  VERBS = DICTIONARY.select {|k,v| v == 'v'}.keys
+  WORDS_WITH_FREQ = self.set_up_dict_hash(this_folder + "/../../word_lists/words_with_freq.txt")
+  #added: an, alert
+  NOUNS = DICTIONARY.select {|k,v| v.include?('n')}.keys
+  PLURALS = NOUNS.map{|noun| [noun, noun.pluralize]}.to_h
+  VERBS = DICTIONARY.select{|k,v| v.include?('v')}.keys
+  #fix above (then fix dictionaries made from this) so verbs that have more than one part of speech are included
   VERB_FORMS_HASH = YAML.load_file(this_folder + '/../../word_lists/verb_forms.yml')
+
   VERB_FORMS_ARRAY = VERB_FORMS_HASH.values.flatten.compact
 
   CONTRACTIONS = self.set_up_dict_hash(this_folder + "/../../word_lists/contractions.txt")
@@ -131,6 +145,10 @@ class String
     end
     if self.include?("n't")
       return self.sub("n't", "")
+    elsif
+    #for tis
+    self[0] = "'"
+      return self[2..-1]
     end
   end
 
@@ -158,10 +176,15 @@ class String
 
 
   def freq(options = {})
+    binding.pry if self == nil
     w_n = options[:word_or_name] || :word
     case w_n
     when :word
-      freq = Vocab::WORDS_WITH_FREQ[self.base].to_i
+      if ["ain't"].include?(self)
+        return 100000
+      end
+      binding.pry if Vocab::WORDS_WITH_FREQ[self.base] == nil
+      freq = Vocab::WORDS_WITH_FREQ[self.base][0].to_i
     when :name
       freq = Vocab::ALL_NAMES[self.upcase].to_f
     end

@@ -8,9 +8,7 @@ class Test_cryp_solver < Test::Unit::TestCase
     assert_equal(4, 2+2)
   end
 
-  def test_something
-    assert_equal(something, "something")
-  end
+
 
   def test_get_indices_of_repeaters
     assert_equal([[2,3]], "hello".get_indices_of_repeaters)
@@ -23,16 +21,10 @@ class Test_cryp_solver < Test::Unit::TestCase
   end
 
   def test_Tracker
-    t1 = Tracker.new()
-    t1.init_WT_from_string("Q ATF'I RFTX CTX ZTW BOOE MYTWI TEA MPO... YWI QF SZ NMVO, Q AQAF'I OJOF VOO QI NTSQFP. QI CQI SO BHTS ICO HOMH. --GCZEEQV AQEEOH")
-    assert_equal(t1.word_tracker[5].x_string, "XOOX")
-    assert_equal(t1.word_tracker[6].x_string, "XXXXX")
-    assert_equal(t1.word_tracker[7].x_string, "XXX")
-    assert_equal(t1.word_tracker[13].x_string, "AXAX'X")
-    t1.lookup_all_likely_words
-    t1.apply_eq_to_WT("q", "i")
-    t1.word_tracker.each {|word| word.sync_progress}
-    assert_equal(:SOLVED, t1.word_tracker[0].progress)
+    cgram_s = "P RMF ME FCN FYUN FCN NGTNDFX, FCN TNMTRN LCM PDN XJTTMXNH FM ON PORN FM FNRR VMJ LCPF FM HM, LYRR FNRR VMJ FCPF VMJ BPI'F HM XMUNFCYIS NANI LCNI VMJ KIML VMJ BPI. PIH P RMF ME FCN FYUN YF'X VMJD EDYNIHX ... LCM FNRR VMJ VMJ BPI HM YF. --UPDK QJBKNDONDS"
+    t1 = CrypTracker.new(string: cgram_s)
+    t1.solve
+    assert_equal(t1.solution, "A LOT OF THE TIME THE EXPERTS, THE PEOPLE WHO ARE SUPPOSED TO BE ABLE TO TELL YOU WHAT TO DO, WILL TELL YOU THAT YOU CAN'T DO SOMETHING EVEN WHEN YOU KNOW YOU CAN. AND A LOT OF THE TIME IT'S YOUR FRIENDS ... WHO TELL YOU YOU CAN DO IT. --MARK ZUCKERBERG")
   end
 
   def test_Vocab
@@ -40,15 +32,15 @@ class Test_cryp_solver < Test::Unit::TestCase
     assert_equal(["lion's"], Vocab.get_likely_wordlist_from_x_string("XiXn'X"))
     assert_equal(["feel", "tool", "cool", "pool", "heel", "peel", "fool"], Vocab.get_likely_wordlist_from_x_string("XEEl"))
     assert_equal(["wouldn't", "couldn't", "course's", "couple's", "source's", "county's", "cousin's"], Vocab.get_likely_wordlist_from_x_string("XouXXX'X"))
-    assert_equal(["in", "if", "hi"], Vocab.get_likely_wordlist_from_x_string("XX", "b","o","t","e","m","v","a","s","c","u"))
+    assert_equal(["in", "if", "hi"], Vocab.get_likely_wordlist_from_x_string("XX", solved_letters: ["b","o","t","e","m","v","a","s","c","u"]))
     assert_equal(["there", "these", "where", "piece", "scene", "theme"], Vocab.get_likely_wordlist_from_x_string("XXeXe"))
-    assert_equal(["where", "piece", "scene"], Vocab.get_likely_wordlist_from_x_string("XXeXe", "t"))
-    assert_equal(["break"], Vocab.get_likely_wordlist_from_x_string("XXeak", "e", "s"))
+    assert_equal(["where", "piece", "scene"], Vocab.get_likely_wordlist_from_x_string("XXeXe", solved_letters: ["t"]))
+    assert_equal(["break"], Vocab.get_likely_wordlist_from_x_string("XXeak", solved_letters: ["e", "s"]))
     assert_equal(["what're", "what've"], Vocab.get_likely_wordlist_from_x_string("wXXX'XX"))
     assert_equal(["what're", "what've", "must've"], Vocab.get_likely_wordlist_from_x_string("XXXX'XX"))
     assert_equal(["what'll", "they'll"], Vocab.get_likely_wordlist_from_x_string("XXXX'RR"))
-    assert_equal(["won't", "can't", "ain't"], Vocab.get_likely_wordlist_from_x_string("XXX'X", "s", "d"))
-    assert_equal(["war's", "tax's", "rat's"], Vocab.get_likely_wordlist_from_x_string("XaX'X", *("a".."p").to_a))
+    assert_equal(["won't", "can't", "ain't"], Vocab.get_likely_wordlist_from_x_string("XXX'X", solved_letters: ["s", "d"]))
+    assert_equal(["war's", "tax's", "rat's"], Vocab.get_likely_wordlist_from_x_string("XaX'X", solved_letters: ("a".."p").to_a))
   end
 
   def test_UsefulStrings

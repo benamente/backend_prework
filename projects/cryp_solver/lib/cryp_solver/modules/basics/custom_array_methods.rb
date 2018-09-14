@@ -167,6 +167,11 @@ module UsefulArrays
       end
     end
 
+    def to_f
+      self[0].to_f
+    end
+
+
 
     #removes all arrays from an array if they cointain a nil element
     def remove_all_with_nil

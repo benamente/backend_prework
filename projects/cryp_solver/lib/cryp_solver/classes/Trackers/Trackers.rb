@@ -224,6 +224,7 @@ class CrypTracker < Tracker
         apply_eq(Equivalency.new(char, equiv.solution[i], :letter)) unless char == "'"
       end
     when :letter
+      binding.pry if l_t.all[equiv.cryp_text] == nil
       l_t.all[equiv.cryp_text].solution = equiv.solution
       u_t.all.values.each do |worddata|
         inds = worddata.cryp_text.get_indices_of_letter(equiv.cryp_text)
@@ -245,22 +246,40 @@ class CrypTracker < Tracker
   end
 
   def solution
-    binding.pry
-    original_string.chars.map { |char| l_t.all[char]}
-
+    sol = original_string.downcase.chars.map { |char| l_t.cipher[char] ? l_t.cipher[char].upcase : char }.join
   end
 
 
   module CrypSolver
     def implement_best_guess
-      implement(g_t.best_guess)
+      binding.pry if g_t.best_guess == nil
+      implement(g_t.best_guess) if g_t.best_guess
     end
     def implement(guess)
       apply_eq(guess.eq)
       update_likely_words
       g_t.gather_good_guesses(self)
     end
+    def guess_until_out_of_guesses(options = {})
+      to_print = options[:print] || false
+       count = 0
+      loop do
+        # t1.g_t.print_with(atts:[:cryp_text, :solution, :goodness])
+        p self.solution if to_print
+        puts "" if to_print
+        self.g_t.print_with(atts:[:cryp_text, :solution, :goodness]) if to_print == :verbose
 
+
+        self.implement_best_guess
+        # t1.u_t.print_with(atts:[:name, :x_string, :likely_solutions, :word_or_name])
+        break if self.g_t.all == {}
+        # break if count == 1
+        count +=1
+      end
+    end
+    def solve
+      self.guess_until_out_of_guesses
+    end
   end
   include CrypSolver
 
@@ -343,6 +362,7 @@ class GuessTracker < Tracker
           num_poss = 0
         end
         if num_poss < 50 && num_poss > 0
+          binding.pry if word.likely_solutions.include?(nil)
           goodness_arr = GuessEval.goodness_by_freq(word.likely_solutions, word_or_name: word.word_or_name)
           word.likely_solutions.each_with_index do |x, index|
             new_guess = Guess.new(:word, word.cryp_text, x, goodness_arr[index])

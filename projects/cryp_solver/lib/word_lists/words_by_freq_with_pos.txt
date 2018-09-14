@@ -47,6 +47,7 @@ about	i
 know	v
 will	v
 as	i
+an  a
 up	r
 one	m
 time	n

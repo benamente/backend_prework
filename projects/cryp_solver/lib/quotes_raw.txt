@@ -203,7 +203,7 @@ Susan B Anthony's Birthday
 --Susan B. Anthony
 
 Thursday, February 16, 2017
-"When I'm old and dying, I plan to look back on my life and say, 'Wow, that was an adventure,' not 'Wow, I sure felt safe.' --Tom PrestonWerner, cofounder of Github
+"When I'm old and dying, I plan to look back on my life and say, 'Wow, that was an adventure,' not 'Wow, I sure felt safe.' --Tom Preston Werner, cofounder of Github
 
 Friday, February 17, 2017
 "Holding on to anger is like grasping a hot coal with the intent of throwing it at someone else; you are the one who gets burned."
@@ -246,7 +246,7 @@ Sunday, February 26, 2017
 --Steve Jobs
 
 Monday, February 27, 2017
-"Every truth passes through three stages before it is recognized. In the first, it is ridiculed. In the second, it is opposed. In the third, it is regarded as self-evident."
+"Every truth passes through three stages before it is recognized. In the first, it is ridiculed. In the second, it is opposed. In the third, it is regarded as self evident."
 --Arthur Schopenhauer
 
 Tuesday, February 28, 2017
@@ -324,7 +324,7 @@ Wednesday, March 15, 2017
 --Jimmy Johnson
 
 Thursday, March 16, 2017
-"Following is one of the most underrated aspects of leadership.... I have seen many a good [organization] underachieve, because someone...thought the commander was incompetent, and quietly worked to undermine his authority."
+"Following is one of the most underrated aspects of leadership.... I have seen many a good organization underachieve, because someone...thought the commander was incompetent, and quietly worked to undermine his authority."
 --Admiral Bill McRaven
 
 Friday, March 17, 2017
@@ -394,7 +394,7 @@ César Chávez Day
 
 Saturday, April 1, 2017
 April Fool's Day
-"I learned pretty soon that it was essential to fail and be foolish. --Daniel DayLewis, only threetime winner of the Academy Award for Best Actor
+"I learned pretty soon that it was essential to fail and be foolish. --Daniel Day Lewis, only threetime winner of the Academy Award for Best Actor
 
 Sunday, April 2, 2017
 "The secret of getting ahead is getting started. The secret of getting started is breaking your complex, overwhelming tasks into smaller manageable tasks, and then starting on the first one."
@@ -1181,7 +1181,7 @@ Thursday, September 28, 2017
 
 Friday, September 29, 2017
 "Someday is not a day of the week."
---Denise BrennanNelson
+--Denise Brennan Nelson
 
 Saturday, September 30, 2017
 "Destiny is not a matter of chance, it is a matter of choice."
