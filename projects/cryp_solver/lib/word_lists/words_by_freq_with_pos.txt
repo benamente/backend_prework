@@ -5000,3 +5000,5 @@ kid	v
 middle-class	j
 apology	n
 till	i
+orphan n
+orphan v

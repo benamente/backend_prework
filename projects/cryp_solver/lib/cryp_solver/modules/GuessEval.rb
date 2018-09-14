@@ -3,10 +3,29 @@
 module GuessEval
 
   def best_guess(arr_of_guesses = self.all.values)
-    best_score = arr_of_guesses.return_objects_with(:attempts, 0).max_attribute(:adjusted_goodness)
-    arr_of_guesses.return_object_with(:adjusted_goodness, best_score)
+    arr_of_guesses.return_object_with(:adjusted_goodness, best_score(arr_of_guesses))
   end
 
+  def best_guess_plus(arr_of_guesses = self.all.values, options = {})
+    bg = best_guess(arr_of_guesses)
+    nbg = next_best_guess(arr_of_guesses)
+    closeness = best_score(arr_of_guesses) - next_best_score(arr_of_guesses)
+    return {best_guess: bg, closeness: closeness, next_best_guess: nbg}
+  end
+
+  private
+  def next_best_score(a_of_g)
+    best_score(a_of_g - best_guess(a_of_g))
+  end
+
+  def next_best_guess(a_of_g)
+    best_guess(a_of_g - best_guess(a_of_g))
+  end
+
+  def best_score(a_of_g)
+    best_score = a_of_g.return_objects_with(:attempts, 0).max_attribute(:adjusted_goodness)
+  end
+  public
 
 
 

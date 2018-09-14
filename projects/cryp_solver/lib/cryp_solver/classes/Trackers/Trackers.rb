@@ -189,31 +189,57 @@ end
 
 
 class CrypTracker < Tracker
-  attr_accessor :u_t, :l_t, :g_t, :u_t_master, :l_t_master, :id, :progress, :original_string, :guesses
+  attr_accessor :u_t, :l_t, :g_t, :u_t_master, :l_t_master, :id, :progress, :original_string, :guesses, :round, :all_rounds
 
-  @@count = 0
   #@@l_t_master = LetterTracker.new()
   #@@u_t_master = []
 
-  def initialize(hash={ut:nil, lt:nil, string:nil})
-    if hash[:string]
-      @original_string = hash[:string]
-      @u_t = UnigramTracker.new(hash[:string])
-      @l_t = LetterTracker.new(hash[:string])
+  def initialize(args={ut:nil, lt:nil, string:nil, round:0})
+    rnum = args[:round] || 0
+    if args[:string]
+      @original_string = args[:string]
+      @u_t = UnigramTracker.new(args[:string])
+      @l_t = LetterTracker.new(args[:string])
       @g_t = GuessTracker.new()
-      if hash[:ut]
-        @u_t = hash[:ut].clone
-        @u_t.map! {|x| x.clone}
-      end
-      if hash[:lt]
-        @l_t = letter_tracker
-      end
-      @@count += 1
-      @id = @@count
       @g_t.gather_good_guesses(self)
+      @all_rounds = []
+
+    elsif args[:ut]
+      @u_t = args[:ut].clone
+      @u_t.all = @u_t.all.map{|k,v| [k, v.clone]}.to_h
     end
+    if args[:lt]
+      @l_t = args[:lt].clone
+      @l_t.all = @l_t.all.map{|k,v| [k, v.clone]}.to_h
+    end
+    if args[:gt]
+      @g_t = args[:gt].clone
+      @g_t.all = @g_t.all.map{|k,v| [k, v.clone]}.to_h
+    end
+    @round = rnum
+
 
   end
+
+
+  def new_round
+    @all_rounds << CrypTracker.new(ut: @u_t, lt: @l_t, gt: @g_t, round: @round)
+    @round += 1
+    @g_t.round = @round
+  end
+
+  def reset_to_round(rnum)
+    oldround = @all_rounds.return_object_with(:round, rnum)
+    @u_t = oldround.u_t
+    @l_t = oldround.l_t
+    @g_t = oldround.g_t
+    @round = oldround.round
+
+  end
+
+
+
+
 
   def apply_eq(equiv)
 
@@ -262,17 +288,17 @@ class CrypTracker < Tracker
     end
     def guess_until_out_of_guesses(options = {})
       to_print = options[:print] || false
-       count = 0
+      count = 0
       loop do
         # t1.g_t.print_with(atts:[:cryp_text, :solution, :goodness])
         p self.solution if to_print
         puts "" if to_print
         self.g_t.print_with(atts:[:cryp_text, :solution, :goodness]) if to_print == :verbose
-
-
+        self.new_round
+        binding.pry
+        break if self.g_t.all == {}
         self.implement_best_guess
         # t1.u_t.print_with(atts:[:name, :x_string, :likely_solutions, :word_or_name])
-        break if self.g_t.all == {}
         # break if count == 1
         count +=1
       end
@@ -298,7 +324,7 @@ end
 
 
 class UnigramTracker < Tracker
-  attr_reader :all, :progress, :names, :words
+  attr_accessor :all, :progress, :names, :words
 
   def initialize(cgram_s)
     array = cgram_s.split_into_dataObjects
@@ -322,12 +348,17 @@ end
 
 
 class GuessTracker < Tracker
-  attr_accessor :all
+  attr_accessor :all, :close_guesses, :round
   def initialize
     @all = {}
     @literally_all
+    @close_guesses
+    @round = 0
   end
 
+  def closest_guess
+
+  end
 
   module Generate
 
@@ -365,7 +396,7 @@ class GuessTracker < Tracker
           binding.pry if word.likely_solutions.include?(nil)
           goodness_arr = GuessEval.goodness_by_freq(word.likely_solutions, word_or_name: word.word_or_name)
           word.likely_solutions.each_with_index do |x, index|
-            new_guess = Guess.new(:word, word.cryp_text, x, goodness_arr[index])
+            new_guess = Guess.new(:word, word.cryp_text, x, goodness_arr[index], @round)
             binding.pry if new_guess.goodness == nil
             guesses << new_guess if new_guess.goodness > 20
           end

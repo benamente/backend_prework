@@ -22,6 +22,8 @@ module Deduction
       if add == false
         next
       else
+        binding.pry
+        #i don't think this ever runs
         arr << Guess.new(:letter, word.cryp_text[i], letter, 90)
       end
     end
