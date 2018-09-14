@@ -99,9 +99,14 @@ class WordData < UnigramData
       else
         @progress = :FILLED
       end
+
     else
-      num_solved = x_string.scan(/[a-z]/).length
-      @progress = 100 * num_solved / x_string.length
+      if @commonness == :WEIRD
+        @progress = 0
+      else
+        num_solved = x_string.scan(/[a-z]/).length
+        @progress = 100 * num_solved / x_string.length
+      end
     end
   end
 
@@ -123,7 +128,14 @@ class WordData < UnigramData
 
   def update_likely_words(solved_letters)
       if likely_solutions
-        @likely_solutions = XWordSearch.match_likely_words(x_string, likely_solutions, *solved_letters)
+        @likely_solutions = XWordSearch.select_words(x_string, likely_solutions, *solved_letters)
+        if @likely_solutions == []
+          @commonness = :UNCOMMON
+          @likely_solutions = XWordSearch.select_words(x_string, Vocab::SO_MANY_WORDS, *solved_letters)
+          if @likely_solutions == []
+            @commonness = :WEIRD
+          end
+        end
       end
   end
 

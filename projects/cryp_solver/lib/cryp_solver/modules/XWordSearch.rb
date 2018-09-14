@@ -21,7 +21,7 @@ module XWordSearch
 
 
   #given a string such as "hXlX" will return an array of all likely words, X's representing any character
-  def self.match_likely_words(x_string, arr_of_words, *solved_letters)
+  def self.select_words(x_string, arr_of_words, *solved_letters)
 
     likely_words = arr_of_words.select{|word| x_string.length == word.length}
     likely_words.map! { |x| x.downcase }

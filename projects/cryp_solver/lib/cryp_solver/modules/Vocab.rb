@@ -96,16 +96,16 @@ LETTER_FREQ_PERC = {a: 8.17, b: 1.49, c: 2.78, d: 4.25, e: 12.70, f: 2.23, g: 2.
     #puts "\n\n\nHERE\n\n\n" if x_string = "AiAX'X"
 
     if x_string.include?("'")
-      poss = XWordSearch.match_likely_words(x_string, Vocab::CONTRACTIONS.keys, *solved_letters)
+      poss = XWordSearch.select_words(x_string, Vocab::CONTRACTIONS.keys, *solved_letters)
       #...possessive nouns
       if /'[s]$/ =~ x_string || /'[X]$/ =~ x_string && !solved_letters.include?('s')
-        potential_possesive_nouns = XWordSearch.match_likely_words(x_string[0..-3], Vocab::NOUNS, *solved_letters)
+        potential_possesive_nouns = XWordSearch.select_words(x_string[0..-3], Vocab::NOUNS, *solved_letters)
         potential_possesive_nouns.map! {|n| n + "'s"}
         poss.concat(potential_possesive_nouns)
       end
 
     else
-      poss = XWordSearch.match_likely_words(x_string, Vocab::ALL_COMMON_FORMS, *solved_letters)
+      poss = XWordSearch.select_words(x_string, Vocab::ALL_COMMON_FORMS, *solved_letters)
 
     end
     if poss
@@ -118,7 +118,7 @@ LETTER_FREQ_PERC = {a: 8.17, b: 1.49, c: 2.78, d: 4.25, e: 12.70, f: 2.23, g: 2.
   end
 
   def self.name_search(x_string)
-     XWordSearch.match_likely_words(x_string, Vocab::ALL_NAMES.keys)
+     XWordSearch.select_words(x_string, Vocab::ALL_NAMES.keys)
 
 
   end
@@ -176,14 +176,18 @@ class String
 
 
   def freq(options = {})
+
     binding.pry if self == nil
+    if Vocab::WORDS_WITH_FREQ[self.base] == nil
+      return 0
+    end
     w_n = options[:word_or_name] || :word
     case w_n
     when :word
       if ["ain't"].include?(self)
         return 100000
       end
-      binding.pry if Vocab::WORDS_WITH_FREQ[self.base] == nil
+      # binding.pry if Vocab::WORDS_WITH_FREQ[self.base] == nil
       freq = Vocab::WORDS_WITH_FREQ[self.base][0].to_i
     when :name
       freq = Vocab::ALL_NAMES[self.upcase].to_f

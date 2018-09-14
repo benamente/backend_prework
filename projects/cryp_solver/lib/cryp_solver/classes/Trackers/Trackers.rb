@@ -58,11 +58,16 @@ class Tracker
             if array == true
               max_length = self.all.values.flatten.list_attribute(att, :to_s).max_attribute(:length)
             else
-              max_length = self.all.values.list_attribute(att, :to_s).max_attribute(:length)
+              if self.all.values.list_attribute(att).any?{|object| [Array, Hash].include?(object.class) }
+                max_length = limit + 2
+              else
+                max_length = self.all.values.list_attribute(att, :to_s).max_attribute(:length)
+              end
             end
           end
 
           num_spaces = max_length - realat.to_s.length + 2
+          binding.pry if num_spaces > 1000
         end
       end
       if i == 0
@@ -293,9 +298,13 @@ class CrypTracker < Tracker
         # t1.g_t.print_with(atts:[:cryp_text, :solution, :goodness])
         p self.solution if to_print
         puts "" if to_print
-        self.g_t.print_with(atts:[:cryp_text, :solution, :goodness]) if to_print == :verbose
+        if to_print == :verbose
+          self.g_t.print_with(atts:[:cryp_text, :solution, :goodness])
+          self.u_t.print_with(atts:[:name, :x_string, :likely_solutions, :commonness])
+        end
+
         self.new_round
-        binding.pry
+        # binding.pry
         break if self.g_t.all == {}
         self.implement_best_guess
         # t1.u_t.print_with(atts:[:name, :x_string, :likely_solutions, :word_or_name])
