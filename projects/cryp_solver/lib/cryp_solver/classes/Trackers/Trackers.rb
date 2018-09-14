@@ -226,6 +226,11 @@ class CrypTracker < Tracker
 
   end
 
+  def stuckness
+
+    u_t.weird_count * 90 + u_t.uncommon_count * 20 - u_t.progress
+  end
+
 
   def new_round
     @all_rounds << CrypTracker.new(ut: @u_t, lt: @l_t, gt: @g_t, round: @round)
@@ -291,7 +296,7 @@ class CrypTracker < Tracker
       update_likely_words
       g_t.gather_good_guesses(self)
     end
-    def guess_until_out_of_guesses(options = {})
+    def guess_until_stuck(options = {})
       to_print = options[:print] || false
       count = 0
       loop do
@@ -305,7 +310,9 @@ class CrypTracker < Tracker
 
         self.new_round
         # binding.pry
-        break if self.g_t.all == {}
+        binding.pry if self.stuckness > 50
+
+        break if self.g_t.all == {} || self.stuckness > 50
         self.implement_best_guess
         # t1.u_t.print_with(atts:[:name, :x_string, :likely_solutions, :word_or_name])
         # break if count == 1
@@ -313,7 +320,8 @@ class CrypTracker < Tracker
       end
     end
     def solve
-      self.guess_until_out_of_guesses
+      self.guess_until_stuck
+
     end
   end
   include CrypSolver
@@ -349,7 +357,28 @@ class UnigramTracker < Tracker
     end
   end
 
+  def progress
+    list = @all.values.list_attribute(:progress)
+    list.map! do |item|
+      case item
+      when :SOLVED
+        100
+      when :FILLED
+        0
+      else
+        item
+      end
+    end
+    list.inject(0,:+)/list.length
+  end
 
+  def weird_count
+    @all.values.count_obs_with(:commonness, :WEIRD)
+  end
+
+  def uncommon_count
+    @all.values.count_obs_with(:commonness, :UNCOMMON)
+  end
 
 
 end

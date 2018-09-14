@@ -10,6 +10,8 @@ module GuessEval
     bg = best_guess(arr_of_guesses)
     nbg = next_best_guess(arr_of_guesses)
     closeness = best_score(arr_of_guesses) - next_best_score(arr_of_guesses)
+
+    @close_guesses[closeness] = nbg
     return {best_guess: bg, closeness: closeness, next_best_guess: nbg}
   end
 
@@ -21,6 +23,7 @@ module GuessEval
   def next_best_guess(a_of_g)
     best_guess(a_of_g - best_guess(a_of_g))
   end
+  #need a better nbg
 
   def best_score(a_of_g)
     best_score = a_of_g.return_objects_with(:attempts, 0).max_attribute(:adjusted_goodness)

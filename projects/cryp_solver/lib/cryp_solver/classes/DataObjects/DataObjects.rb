@@ -83,6 +83,7 @@ class WordData < UnigramData
     @word_or_name = hash[:word_or_name]
     @parts_of_speech_not = []
     @parts_of_speech_likely = []
+    @progress = 0
   end
 
   def sync_progress
@@ -129,7 +130,7 @@ class WordData < UnigramData
   def update_likely_words(solved_letters)
       if likely_solutions
         @likely_solutions = XWordSearch.select_words(x_string, likely_solutions, *solved_letters)
-        if @likely_solutions == []
+        if @likely_solutions == [] && ![:WEIRD,:UNCOMMON].include?(@commonness)
           @commonness = :UNCOMMON
           @likely_solutions = XWordSearch.select_words(x_string, Vocab::SO_MANY_WORDS, *solved_letters)
           if @likely_solutions == []

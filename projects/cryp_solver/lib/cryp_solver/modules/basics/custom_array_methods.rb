@@ -23,6 +23,10 @@ module UsefulArrays
     return list
   end
 
+  def count_obs_with(attribute, value)
+    return_objects_with(attribute, value).length
+  end
+
   def return_object_with(attribute, value)
 
     self.flatten.each do |x|

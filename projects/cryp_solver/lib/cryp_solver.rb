@@ -21,7 +21,7 @@ def solve_me_a_cgram
     cgram_s = "P RMF ME FCN FYUN FCN NGTNDFX, FCN TNMTRN LCM PDN XJTTMXNH FM ON PORN FM FNRR VMJ LCPF FM HM, LYRR FNRR VMJ FCPF VMJ BPI'F HM XMUNFCYIS NANI LCNI VMJ KIML VMJ BPI. PIH P RMF ME FCN FYUN YF'X VMJD EDYNIHX ... LCM FNRR VMJ VMJ BPI HM YF. --UPDK QJBKNDONDS"
   end
   t1 = CrypTracker.new(string: cgram_s)
-  t1.guess_until_out_of_guesses(print: true)
+  t1.guess_until_stuck(print: true)
 
   p t1.solution
 end
