@@ -21,7 +21,7 @@ require_relative "lib/cryp_maker"
 
 #
 
-cgram_s = make_cgram("Fall seven times and stand up eight. --Anonymous")
+cgram_s = make_cgram("NOTHING IS IMPOSSIBLE, THE WORD ITSELF SAYS, 'I'M POSSIBLE!' --AUDREY HEPBURN")
 
 p cgram_s
 t1 = CrypTracker.new(string: cgram_s)

@@ -214,6 +214,7 @@ module DatableStrings
     if by == :word
       items = self.downcase.split(/ /)
       proper = false
+      quote_locs = items.remove_quote_marks
     elsif by == :letter
       items = self.downcase.chars
     end
