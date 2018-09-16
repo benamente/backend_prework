@@ -63,7 +63,6 @@ class Vocab
   #  sum = 180904837
 
   ALL_NAMES = FEMALE_NAMES.merge(MALE_NAMES) {|key, oldval, newval| oldval.to_f > newval.to_f ? oldval : newval}.merge(SURNAMES) {|key, oldval, newval| oldval.to_f > newval.to_f ? oldval : newval}
-
   #
 
   FREQ_FIRST_LETTER = %w(t o a w b c d s f m r h i y e g l n p u j k)
@@ -190,7 +189,7 @@ class String
       # binding.pry if Vocab::WORDS_WITH_FREQ[self.base] == nil
       freq = Vocab::WORDS_WITH_FREQ[self.base][0].to_i
     when :name
-      freq = Vocab::ALL_NAMES[self.upcase].to_f
+      freq = Vocab::ALL_NAMES[self.downcase].to_f
     end
     return freq if freq
     return 0

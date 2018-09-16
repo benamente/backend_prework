@@ -25,11 +25,15 @@ class Test_cryp_solver < Test::Unit::TestCase
     t1 = CrypTracker.new(string: cgram_s)
     t1.solve
     assert_equal(t1.solution, "A LOT OF THE TIME THE EXPERTS, THE PEOPLE WHO ARE SUPPOSED TO BE ABLE TO TELL YOU WHAT TO DO, WILL TELL YOU THAT YOU CAN'T DO SOMETHING EVEN WHEN YOU KNOW YOU CAN. AND A LOT OF THE TIME IT'S YOUR FRIENDS ... WHO TELL YOU YOU CAN DO IT. --MARK ZUCKERBERG")
+    cgram_s = "KHTBSXZ NGF G NRDUXJU LGBNJXF GDU UJLJGB HF GD SXCNGD. --VSND L. MJDDJUZ"
+    t1 = CrypTracker.new(string: cgram_s)
+    t1.solve
+    assert_equal(t1.solution, "VICTORY HAS A HUNDRED FATHERS AND DEFEAT IS AN ORPHAN. --JOHN F. KENNEDY")
   end
 
   def test_Vocab
     assert_equal(["all", "see", "too", "off", "add", "egg", "fee", "odd", "ill", "ass", "bee"], Vocab.get_likely_wordlist_from_x_string("XAA"))
-    assert_equal(["lion's"], Vocab.get_likely_wordlist_from_x_string("XiXn'X"))
+    assert_equal(["sign's", "lion's"], Vocab.get_likely_wordlist_from_x_string("XiXn'X"))
     assert_equal(["feel", "tool", "cool", "pool", "heel", "peel", "fool"], Vocab.get_likely_wordlist_from_x_string("XEEl"))
     assert_equal(["wouldn't", "couldn't", "course's", "couple's", "source's", "county's", "cousin's"], Vocab.get_likely_wordlist_from_x_string("XouXXX'X"))
     assert_equal(["in", "if", "hi"], Vocab.get_likely_wordlist_from_x_string("XX", solved_letters: ["b","o","t","e","m","v","a","s","c","u"]))
@@ -40,7 +44,7 @@ class Test_cryp_solver < Test::Unit::TestCase
     assert_equal(["what're", "what've", "must've"], Vocab.get_likely_wordlist_from_x_string("XXXX'XX"))
     assert_equal(["what'll", "they'll"], Vocab.get_likely_wordlist_from_x_string("XXXX'RR"))
     assert_equal(["won't", "can't", "ain't"], Vocab.get_likely_wordlist_from_x_string("XXX'X", solved_letters: ["s", "d"]))
-    assert_equal(["war's", "tax's", "rat's"], Vocab.get_likely_wordlist_from_x_string("XaX'X", solved_letters: ("a".."p").to_a))
+    assert_equal(["way's", "war's", "tax's", "rat's"], Vocab.get_likely_wordlist_from_x_string("XaX'X", solved_letters: ("a".."p").to_a))
   end
 
   def test_UsefulStrings

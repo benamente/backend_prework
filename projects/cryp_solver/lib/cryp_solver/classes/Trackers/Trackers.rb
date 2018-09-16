@@ -253,7 +253,7 @@ class CrypTracker < Tracker
     @u_t = oldround[0]
     @l_t = oldround[1]
     @g_t.all = oldround[2]
-
+    nil
   end
 
 
