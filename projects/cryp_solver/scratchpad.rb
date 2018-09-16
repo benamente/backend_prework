@@ -1,3 +1,5 @@
+
+
 require "pry"
 require_relative "lib/cryp_solver.rb"
 
@@ -24,7 +26,7 @@ cgram_s = make_cgram("Victory has a hundred fathers and defeat is an orphan. --J
 p cgram_s
 t1 = CrypTracker.new(string: cgram_s)
 # binding.pry
-t1.guess_until_stuck(print: :verbose)
+t1.solve
 p t1.solution
   # t1.u_t.print_with(atts:[:name, :x_string, :likely_solutions, :word_or_name])
 # t1.l_t.print_with(atts:[:name, :perc_freq, :freq, :likely_not], limit: 50)

@@ -176,12 +176,12 @@ class String
 
 
   def freq(options = {})
+    w_n = options[:word_or_name] || :word
 
     binding.pry if self == nil
-    if Vocab::WORDS_WITH_FREQ[self.base] == nil
+    if w_n == :word && Vocab::WORDS_WITH_FREQ[self.base] == nil
       return 0
     end
-    w_n = options[:word_or_name] || :word
     case w_n
     when :word
       if ["ain't"].include?(self)

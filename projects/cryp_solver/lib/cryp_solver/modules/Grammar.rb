@@ -39,7 +39,9 @@ module Grammar
       case word[-1]
       when "."
         letters = word.chars.select{|c| c.letter?}
-        if letters.length == 2
+        if letters.length == 1
+          info = {initial: true}
+        elsif letters.length == 2
           info = {proper: :title_2}
         elsif letters[-3] == "."
           info = {acronym: 99}
@@ -52,7 +54,7 @@ module Grammar
       when "?"
         sentence_type = :question
       end
-      rel_location = :end
+      rel_location = :end unless info[:initial]
       if info == {}
         info = {rel_location: rel_location, sentence_type: sentence_type}
       end
@@ -65,8 +67,11 @@ module Grammar
       if prev_word && prev_word.rel_location = :end
         attribution += 30
       end
-      info[:attribution] = attribution
+    elsif prev_word
+      attribution = prev_word.attribution[-1] - 20
     end
+
+    info[:attribution] = attribution
     return info
   end
 

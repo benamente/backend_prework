@@ -13,6 +13,7 @@ require_relative "../modules/GuessEval.rb"
 class Guess
 
   include GuessEval
+  include Comparable
 
   Equivalency = Struct.new(:word_or_letter, :cryp_text, :solution)
 
@@ -27,21 +28,39 @@ class Guess
     # if @@all_guesses.list_attribute(:eq).include?(@eq)
     # #   @attempts += 1
     # else
-      @goodness = goodness
-      @badness = 0
-      @adjusted_goodness = goodness - badness
-      @@all_guesses << self
-      @name = eq.solution.to_s
+    @goodness = goodness
+    @badness = 0
+    @adjusted_goodness = goodness - badness
+    @@all_guesses << self
+    @name = eq.solution.to_s
     # end
   end
+  #
+  def <=>(other)
+    unless other.is_a? Guess
+      return nil
+    end
+    if self.cryp_text == other.cryp_text
+      if self.solution == other.solution
+        return 0
+      end
+    end
+    if self.adjusted_goodness > other.adjusted_goodness
+      return 1
+    else
+      return -1
+    end
 
+  end
 
-
-
-
-
-
-
+  def eql?(other)
+    if (self <=> other) == 0
+      return true
+    else
+      return false
+    end
+  end
+  # alias :==
 
 
 end

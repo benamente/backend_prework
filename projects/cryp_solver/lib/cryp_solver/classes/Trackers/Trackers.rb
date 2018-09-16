@@ -8,6 +8,7 @@ require_relative "../../modules/XWordSearch.rb"
 require_relative "../DataObjects/DataObjects.rb"
 require_relative "../Guess.rb"
 
+
 require "pp"
 
 
@@ -19,10 +20,17 @@ require "pp"
 class Tracker
 
 
-  def print_with(hash={})
-    atts = hash[:atts] || atts = []
-    att_of_att = hash[:att_of_att] || att_of_att = {}
-    limit = hash[:limit] || limit = 35
+  def print_with(args={})
+    if args.is_a?(Hash) && args[:atts]
+      atts = args[:atts]
+      att_of_att = args[:att_of_att] || att_of_att = {}
+      limit = args[:limit] || limit = 35
+    else
+      atts = args
+      limit = 35
+    end
+
+
 
     self.all.values.each do |dataob|
       if dataob.is_a? Array
@@ -37,7 +45,7 @@ class Tracker
 
       end
     end
-
+    return nil
   end
 
   def print_dataobject(dataob, atts, limit, array = false)
@@ -208,18 +216,17 @@ class CrypTracker < Tracker
       @g_t = GuessTracker.new()
       @g_t.gather_good_guesses(self)
       @all_rounds = []
+      @best_progress = 0
+      @best_round = :NONE
 
     elsif args[:ut]
-      @u_t = args[:ut].clone
-      @u_t.all = @u_t.all.map{|k,v| [k, v.clone]}.to_h
+      @u_t = args[:ut]
     end
     if args[:lt]
-      @l_t = args[:lt].clone
-      @l_t.all = @l_t.all.map{|k,v| [k, v.clone]}.to_h
+      @l_t = args[:lt]
     end
     if args[:gt]
-      @g_t = args[:gt].clone
-      @g_t.all = @g_t.all.map{|k,v| [k, v.clone]}.to_h
+      @g_t = args[:gt]
     end
     @round = rnum
 
@@ -227,26 +234,27 @@ class CrypTracker < Tracker
   end
 
   def stuckness
-
     u_t.weird_count * 90 + u_t.uncommon_count * 20 - u_t.progress
   end
 
 
   def new_round
-    @all_rounds << CrypTracker.new(ut: @u_t, lt: @l_t, gt: @g_t, round: @round)
+    @all_rounds[@round] = Marshal.dump([@u_t, @l_t, @g_t.all])
+    if @u_t.progress > @best_progress
+      @best_round = @round
+      @best_progress = @u_t.progress
+    end
     @round += 1
     @g_t.round = @round
   end
 
   def reset_to_round(rnum)
-    oldround = @all_rounds.return_object_with(:round, rnum)
-    @u_t = oldround.u_t
-    @l_t = oldround.l_t
-    @g_t = oldround.g_t
-    @round = oldround.round
+    oldround = Marshal.load(@all_rounds[rnum])
+    @u_t = oldround[0]
+    @l_t = oldround[1]
+    @g_t.all = oldround[2]
 
   end
-
 
 
 
@@ -281,21 +289,45 @@ class CrypTracker < Tracker
     @g_t.gather_good_guesses(self)
   end
 
+  def delete_bad_guesses_from_likely_words
+    bad_cs = g_t.bad_guesses.list_attribute(:cryp_text)
+    bad_ss = g_t.bad_guesses.list_attribute(:solution)
+    @u_t.all.each do |k,word|
+      if word.likely_solutions
+        word.likely_solutions.delete_if{|sol| bad_ss.index(sol) && bad_cs[bad_ss.index(sol)] == word.cryp_text }
+      end
+    end
+  end
+
   def solution
     sol = original_string.downcase.chars.map { |char| l_t.cipher[char] ? l_t.cipher[char].upcase : char }.join
   end
 
 
+
+
+  # include Restrospect
+
   module CrypSolver
+
     def implement_best_guess
       binding.pry if g_t.best_guess == nil
       implement(g_t.best_guess) if g_t.best_guess
     end
     def implement(guess)
+      @g_t.guesses_taken << guess
       apply_eq(guess.eq)
       update_likely_words
       g_t.gather_good_guesses(self)
     end
+    def go_back_wiser(bad_guess)
+      binding.pry if bad_guess.is_a?(Array)
+      reset_to_round(bad_guess.round)
+      @g_t.bad_guesses << bad_guess
+      self.delete_bad_guesses_from_likely_words
+
+    end
+
     def guess_until_stuck(options = {})
       to_print = options[:print] || false
       count = 0
@@ -310,18 +342,39 @@ class CrypTracker < Tracker
 
         self.new_round
         # binding.pry
-        binding.pry if self.stuckness > 50
+        #binding.pry if self.stuckness > 50
 
-        break if self.g_t.all == {} || self.stuckness > 50
+        if self.stuckness > 50 || g_t.best_guess == nil
+          return @g_t.regrettable_guess
+        end
         self.implement_best_guess
         # t1.u_t.print_with(atts:[:name, :x_string, :likely_solutions, :word_or_name])
         # break if count == 1
         count +=1
       end
     end
-    def solve
-      self.guess_until_stuck
 
+
+    def solve
+      count = 0
+      loop do
+        bad_guess = self.guess_until_stuck
+        unless bad_guess
+          binding.pry
+          break
+        end
+        if @u_t.progress == 100
+          break
+        end
+        count += 1
+        if @round > 40
+          reset_to_round(@best_round)
+          binding.pry
+          break
+        end
+        go_back_wiser(bad_guess)
+
+      end
     end
   end
   include CrypSolver
@@ -341,13 +394,15 @@ end
 
 
 class UnigramTracker < Tracker
-  attr_accessor :all, :progress, :names, :words
+  attr_accessor :all, :progress, :names, :words, :name_initial_count
 
   def initialize(cgram_s)
     array = cgram_s.split_into_dataObjects
     @all = (array.map { |x| [x.name, x]}).to_h
     @names = @all.select {|k,v| v.word_or_name == :name }
     @words = @all.select {|k,v| v.word_or_name == :word }
+
+    @name_initial_count = @all.values.select { |word| word.name_initial? }.length
     self.lookup_all_likely_words
   end
 
@@ -369,7 +424,7 @@ class UnigramTracker < Tracker
         item
       end
     end
-    list.inject(0,:+)/list.length
+    list.inject(0,:+) / (list.length - @name_initial_count)
   end
 
   def weird_count
@@ -380,18 +435,19 @@ class UnigramTracker < Tracker
     @all.values.count_obs_with(:commonness, :UNCOMMON)
   end
 
-
 end
 
 
 
 class GuessTracker < Tracker
-  attr_accessor :all, :close_guesses, :round
+  attr_accessor :all, :close_guesses, :round, :bad_guesses, :guesses_taken
   def initialize
     @all = {}
     @literally_all
     @close_guesses
     @round = 0
+    @bad_guesses = []
+    @guesses_taken = []
   end
 
   def closest_guess
