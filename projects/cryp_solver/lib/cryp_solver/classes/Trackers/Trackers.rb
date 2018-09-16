@@ -325,6 +325,8 @@ class CrypTracker < Tracker
       reset_to_round(bad_guess.round)
       @g_t.bad_guesses << bad_guess
       self.delete_bad_guesses_from_likely_words
+      @g_t.gather_good_guesses(self)
+
 
     end
 
