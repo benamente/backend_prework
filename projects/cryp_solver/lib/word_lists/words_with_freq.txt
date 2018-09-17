@@ -1,5 +1,5 @@
 the	22038615
-be	1254582
+be	7254582
 and	10741073
 of	10343885
 a	10144200
@@ -1799,6 +1799,7 @@ politician	20360
 steal	20296
 pursue	20136
 slip	21233
+percent 30774
 percentage	20774
 meat	20271
 funny	20399

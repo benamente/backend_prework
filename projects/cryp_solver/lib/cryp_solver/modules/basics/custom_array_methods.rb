@@ -1,6 +1,14 @@
 
 module UsefulArrays
 
+  def normalize(ceiling)
+    sum = self.inject(0,:+)
+    if sum == 0
+      return [0] * arr_of_strings.length
+    end
+    self.map! {|num| ceiling * num/sum}
+  end
+
   def max_attribute(attribute)
     max = 0
     self.each do |x|
@@ -22,6 +30,20 @@ module UsefulArrays
     end
     return list
   end
+  alias :la :list_attribute
+
+  def list_attributes(*attributes)
+    list = []
+    self.each do |x|
+      l = []
+      attributes.each do |attribute|
+        l << x.public_send(attribute)
+      end
+      list << l
+    end
+    return list
+  end
+  alias :las :list_attributes
 
   def count_obs_with(attribute, value)
     return_objects_with(attribute, value).length
@@ -36,6 +58,7 @@ module UsefulArrays
     end
     return nil
   end
+  alias :row :return_object_with
 
   def return_objects_with(attribute, value)
     new_arr = []

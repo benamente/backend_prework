@@ -32,7 +32,9 @@ module XWordSearch
     #now cases where there are solved_letters (but no repeaters...)
     unsolved_repeaters = x_string.chars.reject{|char| char.is_lower? || char == "X"}
     if unsolved_repeaters.length == 0
-      return match_likely_with_solved_letters(x_string, likely_words, *solved_letters)
+      return match_likely_with_solved_letters(x_string, likely_words, *solved_letters).reject do |x|
+        x.has_repeater_chars?(x_string.chars)
+      end
     else
 
       #now cases where there are repeating characters

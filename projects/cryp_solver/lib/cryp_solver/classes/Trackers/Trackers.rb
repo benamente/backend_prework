@@ -47,6 +47,7 @@ class Tracker
     end
     return nil
   end
+  alias :pw :print_with
 
   def print_dataobject(dataob, atts, limit, array = false)
 
@@ -235,7 +236,7 @@ class CrypTracker < Tracker
   end
 
   def stuckness
-    u_t.weird_count * 90 + u_t.uncommon_count ** 2 * 10 - u_t.progress
+    u_t.weird_count ** 2 * (u_t.uncommon_count + 1) * 70 + u_t.uncommon_count * 20 - u_t.progress
   end
 
 
@@ -333,13 +334,18 @@ class CrypTracker < Tracker
 
     def implement_best_guess
       binding.pry if g_t.best_guess == nil
-      implement(g_t.best_guess) if g_t.best_guess
+      if g_t.best_guess
+        implement(g_t.best_guess)
+      else
+        return :stuck
+      end
     end
     def implement(guess)
       c_g = @g_t.current_guess
       if c_g
         guess.parent = c_g.round
         guess.depth = c_g.depth + 1
+        c_g.num_children += 1
       end
       @g_t.guesses_taken << guess
       apply_eq(guess.eq)
@@ -347,9 +353,23 @@ class CrypTracker < Tracker
       g_t.gather_good_guesses(self)
       first_word_bonus
     end
+
+    def reach_back_for_undoubted_round(bad_guess)
+      parent = @g_t.get_parent(bad_guess)
+      if parent && parent.doubt > 30
+        reach_back_for_undoubted_round(parent)
+      else
+        return bad_guess.round
+      end
+    end
+
+
+
     def go_back_wiser(bad_guess)
       binding.pry if bad_guess.is_a?(Array)
-      reset_to_round(bad_guess.round)
+      r = reach_back_for_undoubted_round(bad_guess)
+      reset_to_round(r)
+      @g_t.bad_guesses -= @g_t.get_descendants(bad_guess)
       @g_t.bad_guesses << bad_guess
       self.delete_bad_guesses_from_likely_words
       @g_t.gather_good_guesses(self)
@@ -378,9 +398,13 @@ class CrypTracker < Tracker
         #binding.pry if self.stuckness > 50
 
         if self.stuckness > 50 || g_t.best_guess == nil
+          r_g = @g_t.regrettable_guess
+          @g_t.raise_doubt(r_g)
+          return r_g
+        end
+        if self.implement_best_guess == :stuck
           return @g_t.regrettable_guess
         end
-        self.implement_best_guess
         # t1.u_t.print_with(atts:[:name, :x_string, :likely_solutions, :word_or_name])
         # break if count == 1
       end
@@ -402,6 +426,7 @@ class CrypTracker < Tracker
         end
         if @round > 40
           reset_to_round(@best_round)
+          # binding.pry
           break
         end
         go_back_wiser(bad_guess)
@@ -479,16 +504,60 @@ class GuessTracker < Tracker
     @round = 0
     @bad_guesses = []
     @guesses_taken = []
+    @num_children = []
   end
 
   def closest_guess
 
   end
 
+
+
   def current_guess
     good_guesses = @guesses_taken - @bad_guesses
     good_guesses[-1]
   end
+
+  #given a regrettable_guess, raises doubt about it's parent guesses.
+  def raise_doubt(regrettable, amount = 10)
+    amount = 1 if amount < 1
+    p_g = get_parent(regrettable)
+    return unless p_g
+    p_g.doubt += amount
+    if p_g.parent
+      raise_doubt(p_g, amount - 1)
+    end
+  end
+
+  def doubted_guesses
+    @guesses_taken.select{|g| g.doubt > 30}
+  end
+
+  def get_parent(guess)
+    return nil unless guess
+    @guesses_taken.row(:round, guess.parent)
+  end
+
+  def get_children(guess)
+    @guesses_taken.select {|g| get_parent(g) == guess}
+  end
+
+  def get_descendants(guess)
+    desc = get_children(guess)
+    return desc if desc == []
+    desc.each do |g|
+      if g.num_children == 0
+        return desc
+      else
+        desc += get_descendants(g)
+      end
+    end
+    binding.pry
+
+    return desc
+  end
+
+
 
   module Generate
 
@@ -507,24 +576,41 @@ class GuessTracker < Tracker
     end
 
     def get_word_guesses(ctracker)
-      b = word_guesses(ctracker.u_t)
+      b = word_guesses(ctracker.u_t.all.values)
+    end
+
+    def bad_guesses_for_word(word)
+      bad_guesses.return_objects_with(:cryp_text, word.name)
+    end
+
+    def bad_solutions_for_word(word)
+      bad_guesses_for_word(word).la(:solution)
+    end
+
+    def doubted_guesses_for_word(word)
+      doubted_guesses.return_objects_with(:cryp_text, word.name)
+    end
+
+    def doubted_solutions_for_word(word)
+      doubted_guesses_for_word(word).la(:solution)
     end
 
     private
 
-    def word_guesses(ut)
+    def word_guesses(arr_o_w)
       guesses = []
-      ut.all.values.each do |word|
+      arr_o_w.each do |word|
         if word.solution
           next
         elsif word.likely_solutions
-          num_poss = word.likely_solutions.length
+          possible = word.likely_solutions - bad_solutions_for_word(word)
+          num_poss = possible.length
         else
           num_poss = 0
         end
         if num_poss < 50 && num_poss > 0
           binding.pry if word.likely_solutions.include?(nil)
-          goodness_arr = GuessEval.goodness_by_freq(word.likely_solutions, word_or_name: word.word_or_name)
+          goodness_arr = GuessEval.goodness_by_freq(word.likely_solutions, word_or_name: word.word_or_name, doubted_guesses: doubted_guesses_for_word(word))
           word.likely_solutions.each_with_index do |x, index|
             new_guess = Guess.new(:word, word.cryp_text, x, goodness_arr[index], @round)
             binding.pry if new_guess.goodness == nil

@@ -42,18 +42,34 @@ module GuessEval
   end
   public
 
+  def self.doubt_to_subtract(d_gs, arr_strings)
+    dts ={}
+    d_gs.each do |g|
+      i = arr_strings.index(g.solution)
+      if i
+        dts[i] = g.doubt
+      end
+    end
+    dts
+  end
 
+  def self.apply_doubt(d_gs, normed_arr, arr_strings)
+    doubt_to_subtract(d_gs, arr_strings).each do |index, doubt|
+      normed_arr[index] /= (doubt/5)
+    end
+  end
 
   def self.goodness_by_freq(arr_of_strings, options = {})
+    d_gs = options[:doubted_guesses]
 
     word_or_name = options[:word_or_name] || :word
     arr_of_freq = arr_of_strings.map {|s| s.freq(word_or_name: word_or_name)}
-    freq_sum = arr_of_freq.inject{ |sum, n| sum + n }
-
-    if freq_sum == 0
-      return [0] * arr_of_strings.length
+    arr_of_goodness = arr_of_freq.normalize(100)
+    if d_gs && d_gs != []
+      apply_doubt(d_gs, arr_of_goodness, arr_of_strings)
+      arr_of_goodness = arr_of_goodness.normalize(100)
     end
-    arr_of_goodness = arr_of_freq.map {|num| 100 * num/freq_sum}
+
     # binding.pry if arr_of_strings.include?("fears")
     return arr_of_goodness
   end

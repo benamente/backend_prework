@@ -18,8 +18,8 @@ class Guess
   Equivalency = Struct.new(:word_or_letter, :cryp_text, :solution)
 
   attr_accessor :goodness, :badness, :eq, :attempts, :tracker, :name,
-                :cryp_text, :solution, :round,
-                :bonuses, :word_or_letter, :parent, :depth
+                :cryp_text, :solution, :round, :num_children,
+                :bonuses, :word_or_letter, :parent, :depth, :doubt
 
   @@all_guesses = []
   def initialize(word_or_letter, cryp_text, solution, goodness, round)
@@ -38,6 +38,8 @@ class Guess
     @name = eq.solution.to_s
     @bonuses = {}
     @depth = 0
+    @doubt = 0
+    @num_children = 0
     # end
   end
   #

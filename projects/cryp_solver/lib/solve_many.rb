@@ -3,9 +3,9 @@ require_relative "cryp_solver.rb"
 require "pp"
 class Cryp_Store
 
-  THIS_FOLDER = File.expand_path(__dir__)
+  this_folder = File.expand_path(__dir__)
 
-  quotes_to_test = File.open(THIS_FOLDER + "/quotes_raw.txt", "r").read.delete('"')
+  quotes_to_test = File.open(this_folder + "/quotes_raw.txt", "r").read.delete('"')
 
 
 
@@ -13,14 +13,14 @@ class Cryp_Store
 
   originals = arr.map{|line| line.gsub("\n", " ").upcase}.reject{|line| line.match(/[0-9]/)}
 
-  originals = originals[40..60]
+  originals = originals[0..60]
 
   CRYP_ARR = originals.map {|line| make_cgram(line)}
 
 end
 
 def solve_many
-  completeds = CRYP_ARR.map {|line| p c_solve(line)}
+  completeds = Cryp_Store::CRYP_ARR.map {|line| p c_solve(line)}
 
   solved_count = 0
 
@@ -30,7 +30,7 @@ def solve_many
     end
   end
 
-  p 100 * solved_count/CRYP_ARR.length
+  p 100 * solved_count/Cryp_Store::CRYP_ARR.length
 end
 
 if __FILE__ == $0
