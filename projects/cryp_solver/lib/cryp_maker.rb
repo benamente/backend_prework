@@ -19,7 +19,9 @@ def make_gram_for_user
   puts "Enter Text:"
   text = gets.chomp
   cryptext = make_cgram(text)
+  puts "Cryptogram"
   puts cryptext
+  return cryptext
 end
 
 if __FILE__ == $0

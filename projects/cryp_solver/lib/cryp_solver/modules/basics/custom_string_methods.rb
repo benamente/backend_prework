@@ -1,12 +1,6 @@
 module UsefulStrings
 
 
-  #borrowed this from online. gets the indeces of a regular expression
-  def indices e
-    start, result = -1, []
-    result << start while start = (self.index e, start + 1)
-    result
-  end
 
 
   def is_upper?
@@ -69,8 +63,9 @@ module UsefulStrings
 
   #returns the string with all its letters replaced by X's 'exc'luding given letters
   def x_out_except(*exc)
+    exc += ('0'..'9').to_a
     exc.flatten!
-    return self.chars.map { |ch| exc.include?(ch)? ch: "X" }.join
+    return self.chars.map { |ch| exc.include?(ch) ? ch: "X" }.join
   end
 
   # given a 'c'har and an 'a'rray of indeces, returns a new string where chars in string are replaced at indeces
@@ -139,6 +134,13 @@ module UsefulStrings
     return x_safe.x_out_except(x_safe.get_repeater_chars, "'").upcase
   end
 
+  #borrowed this from stack overflow. gets the indeces of a regular expression
+  def indices e
+    start, result = -1, []
+    result << start while start = (self.index e, start + 1)
+    result
+  end
+
   #returns list of indices (as array (or nested arrays if multiple repeating characters)) of characters that repeat
   # "Yell" would return [2,3] because those are the positions of the repeating lls
   # "marketer" would return [[2,7][4,6]]
@@ -200,7 +202,9 @@ module UsefulStrings
 end
 
 module DatableStrings
-
+# returns the previous item's string, not the item object itself. Ignores strings
+# that never get turned into items such as ... and retrieves the string one further back
+# (In this case it would be "as")
   def find_prev_item_string(storarray, items, index, number_back = 0)
     prev_item_s = items[index - 1 - number_back]
     if prev_item_s == ""

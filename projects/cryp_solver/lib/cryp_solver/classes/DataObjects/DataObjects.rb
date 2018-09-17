@@ -64,7 +64,7 @@ class UnigramData < DataObject
   attr_accessor :cryp_text, :x_string, :likely_solutions, :solution, :progress
   attr_accessor :parts_of_speech_not,  :parts_of_speech_likely, :part_of_speech
   attr_accessor :abs_location, :rel_location, :punctuation, :freq, :name, :commonness
-  attr_accessor :length, :prev_word, :next_word, :word_or_name, :attribution
+  attr_accessor :length, :prev_word, :next_word, :word_or_name, :attribution, :excepted
 
 end
 
@@ -84,6 +84,9 @@ class WordData < UnigramData
     @parts_of_speech_not = []
     @parts_of_speech_likely = []
     @progress = 0
+    if @name.index(/\d/)
+      @excepted = true
+    end
   end
 
   def sync_progress
@@ -128,7 +131,7 @@ class WordData < UnigramData
   end
 
   def update_likely_words(solved_letters)
-    if likely_solutions
+    if likely_solutions && !excepted
       @likely_solutions = XWordSearch.select_words(x_string, likely_solutions, *solved_letters)
       if @likely_solutions == [] && ![:WEIRD,:UNCOMMON].include?(@commonness) && @word_or_name == :word
         if @x_string.include?("'")

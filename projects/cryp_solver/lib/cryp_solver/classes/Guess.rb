@@ -19,10 +19,11 @@ class Guess
 
   attr_accessor :goodness, :badness, :eq, :attempts, :tracker, :name,
                 :cryp_text, :solution, :round,
-                :bonuses
+                :bonuses, :word_or_letter, :parent, :depth
 
   @@all_guesses = []
   def initialize(word_or_letter, cryp_text, solution, goodness, round)
+    @word_or_letter = word_or_letter
     @round = round
     @eq = Equivalency.new(word_or_letter, cryp_text, solution)
     @cryp_text = cryp_text
@@ -36,6 +37,7 @@ class Guess
     @@all_guesses << self
     @name = eq.solution.to_s
     @bonuses = {}
+    @depth = 0
     # end
   end
   #

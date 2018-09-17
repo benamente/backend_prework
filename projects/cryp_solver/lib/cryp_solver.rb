@@ -2,6 +2,9 @@ require 'rubygems'
 require 'require_all'
 # require './lib/cryp_solver/structs/Probability.rb'
 require_rel 'cryp_solver'
+require_relative 'cryp_maker.rb'
+require_relative 'solve_many.rb'
+
 
 
 
@@ -14,14 +17,24 @@ def c_solve(text)
 end
 
 def solve_me_a_cgram
-  puts "Enter cryptogram, or, press enter and I'll solve one from my database."
+  puts "Enter a cryptogram! Must be more than 10 characters, no double quotes,
+or proper names unless attributed at the end such as --Hjwrt Wfds Lrth.
+No numbers yet either. I'm working on it.\n"
+  puts "Or... press enter and I'll solve one from my database.\n"
+  puts "Or... enter 'm' and then some text, and I'll make a cryptogram to solve."
+
+
   cgram_s = gets.chomp
+  if cgram_s == 'm'
+    cgram_s = make_gram_for_user
+    puts "\n...Now solving...\n"
+  end
 
   if cgram_s.length < 10
-    cgram_s = "P RMF ME FCN FYUN FCN NGTNDFX, FCN TNMTRN LCM PDN XJTTMXNH FM ON PORN FM FNRR VMJ LCPF FM HM, LYRR FNRR VMJ FCPF VMJ BPI'F HM XMUNFCYIS NANI LCNI VMJ KIML VMJ BPI. PIH P RMF ME FCN FYUN YF'X VMJD EDYNIHX ... LCM FNRR VMJ VMJ BPI HM YF. --UPDK QJBKNDONDS"
+    cgram_s = Cryp_Store::CRYP_ARR.sample
   end
   t1 = CrypTracker.new(string: cgram_s)
-  t1.guess_until_stuck(print: true)
+  t1.solve(:print)
 
   p t1.solution
 end

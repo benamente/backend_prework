@@ -317,7 +317,7 @@ class CrypTracker < Tracker
           if word.rel_location.include?(0) && word.word_or_name == :word
 
             if FIRST_WORD_BONUSES.keys.include?(guess.solution)
-              binding.pry
+              # binding.pry
               guess.bonuses[:first_word] = FIRST_WORD_BONUSES[guess.solution]
             end
           end
@@ -336,6 +336,11 @@ class CrypTracker < Tracker
       implement(g_t.best_guess) if g_t.best_guess
     end
     def implement(guess)
+      c_g = @g_t.current_guess
+      if c_g
+        guess.parent = c_g.round
+        guess.depth = c_g.depth + 1
+      end
       @g_t.guesses_taken << guess
       apply_eq(guess.eq)
       update_likely_words
@@ -353,9 +358,12 @@ class CrypTracker < Tracker
 
     end
 
-    def guess_until_stuck(options = {})
-      to_print = options[:print] || false
-      count = 0
+    def guess_until_stuck(*options)
+      if options.include?(:print)
+        to_print = true
+      else
+        to_print = false
+      end
       loop do
         # t1.g_t.print_with(atts:[:cryp_text, :solution, :goodness])
         p self.solution if to_print
@@ -375,15 +383,16 @@ class CrypTracker < Tracker
         self.implement_best_guess
         # t1.u_t.print_with(atts:[:name, :x_string, :likely_solutions, :word_or_name])
         # break if count == 1
-        count +=1
       end
     end
 
 
-    def solve
-      count = 0
+    def solve(*options)
       loop do
-        bad_guess = self.guess_until_stuck
+        bad_guess = self.guess_until_stuck(*options)
+        if options.include?(:print)
+          puts "\nGuessing #{bad_guess.solution.upcase} was a dead end. I'm going back.\n"
+        end
         unless bad_guess
           binding.pry
           break
@@ -391,7 +400,6 @@ class CrypTracker < Tracker
         if @u_t.progress == 100
           break
         end
-        count += 1
         if @round > 40
           reset_to_round(@best_round)
           break
@@ -475,6 +483,11 @@ class GuessTracker < Tracker
 
   def closest_guess
 
+  end
+
+  def current_guess
+    good_guesses = @guesses_taken - @bad_guesses
+    good_guesses[-1]
   end
 
   module Generate

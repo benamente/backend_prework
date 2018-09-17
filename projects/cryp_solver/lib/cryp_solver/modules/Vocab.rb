@@ -91,6 +91,9 @@ LETTER_FREQ_PERC = {a: 8.17, b: 1.49, c: 2.78, d: 4.25, e: 12.70, f: 2.23, g: 2.
   end
 
   def self.get_likely_wordlist_from_x_string(x_string, options = {})
+    if x_string.index(/\d/)
+      return []
+    end
     solved_letters = options[:solved_letters] || []
     word_list = options[:word_list] || Vocab::ALL_COMMON_FORMS
     #Deals with words with apostrophes be they contractions or...
