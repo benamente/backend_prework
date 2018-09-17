@@ -61,8 +61,10 @@ class Vocab
   MALE_NAMES = set_up_dict_hash(this_folder + "/../../word_lists/male_names_with_pf.txt")
   SURNAMES = YAML.load_file(this_folder + "/../../word_lists/surnames_with_pf.yml")
   #  sum = 180904837
+  nparr = %w(de, da)
+  NAME_PARTS = nparr.zip([0.1] * nparr.length).to_h
 
-  ALL_NAMES = FEMALE_NAMES.merge(MALE_NAMES) {|key, oldval, newval| oldval.to_f > newval.to_f ? oldval : newval}.merge(SURNAMES) {|key, oldval, newval| oldval.to_f > newval.to_f ? oldval : newval}
+  ALL_NAMES = FEMALE_NAMES.merge(MALE_NAMES) {|key, oldval, newval| oldval.to_f > newval.to_f ? oldval : newval}.merge(SURNAMES) {|key, oldval, newval| oldval.to_f > newval.to_f ? oldval : newval}.merge(NAME_PARTS)
   #
 
   FREQ_FIRST_LETTER = %w(t o a w b c d s f m r h i y e g l n p u j k)
@@ -179,7 +181,7 @@ class String
 
     binding.pry if self == nil
     if w_n == :word && Vocab::WORDS_WITH_FREQ[self.base] == nil
-      return 0
+      return 0.000001
     end
     case w_n
     when :word

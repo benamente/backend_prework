@@ -214,7 +214,6 @@ module UsefulArrays
         qms.each do |loc|
           if loc[0] == :begin
             self[loc[1]].slice!(0)
-            binding.pry
 
             began = true
           elsif loc[0] == :end && began == true
@@ -227,7 +226,27 @@ module UsefulArrays
       end
 
     end
+    return qms
   end
+
+  def remove_hyphenation
+    hys_posns = []
+    new_arr = self.each_with_index.map do |word, i|
+      hys_posns << i
+      posns = word.indices /\w-\w/
+      unless posns == []
+        posns.each do |pos|
+          word[pos+1] = " "
+        end
+        word.split
+      else
+        word
+      end
+    end
+    new_arr.flatten!
+    return {new_arr: new_arr, hys_posns: hys_posns}
+end
+
 
 end
 
@@ -235,4 +254,3 @@ end
 class Array
   include UsefulArrays
 end
-binding.pry

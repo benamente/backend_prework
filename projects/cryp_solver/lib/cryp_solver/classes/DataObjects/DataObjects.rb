@@ -128,9 +128,12 @@ class WordData < UnigramData
   end
 
   def update_likely_words(solved_letters)
-      if likely_solutions
-        @likely_solutions = XWordSearch.select_words(x_string, likely_solutions, *solved_letters)
-        if @likely_solutions == [] && ![:WEIRD,:UNCOMMON].include?(@commonness) && @word_or_name == :word
+    if likely_solutions
+      @likely_solutions = XWordSearch.select_words(x_string, likely_solutions, *solved_letters)
+      if @likely_solutions == [] && ![:WEIRD,:UNCOMMON].include?(@commonness) && @word_or_name == :word
+        if @x_string.include?("'")
+          @commonness = :WEIRD
+        else
           @commonness = :UNCOMMON
           @likely_solutions = XWordSearch.select_words(x_string, Vocab::SO_MANY_WORDS, *solved_letters)
           if @likely_solutions == []
@@ -138,6 +141,7 @@ class WordData < UnigramData
           end
         end
       end
+    end
   end
 
 

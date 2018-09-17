@@ -10,7 +10,6 @@ require_relative "lib/cryp_maker"
 
 
 
-
 # def something(options = {:just => "do it"})
 #   if options[:just] == "do it"
 #     puts "I did it!"
@@ -21,8 +20,7 @@ require_relative "lib/cryp_maker"
 
 #
 
-cgram_s = make_cgram("NOTHING IS IMPOSSIBLE, THE WORD ITSELF SAYS, 'I'M POSSIBLE!' --AUDREY HEPBURN")
-
+cgram_s = make_cgram("I love to see a young girl go out and grab the world by the lapels. Life's a bitch. You've got to go out and kick ass. --Maya Angelou")
 p cgram_s
 t1 = CrypTracker.new(string: cgram_s)
 # binding.pry

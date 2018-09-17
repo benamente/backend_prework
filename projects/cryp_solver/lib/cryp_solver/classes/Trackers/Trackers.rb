@@ -215,6 +215,7 @@ class CrypTracker < Tracker
       @l_t = LetterTracker.new(args[:string])
       @g_t = GuessTracker.new()
       @g_t.gather_good_guesses(self)
+      first_word_bonus
       @all_rounds = []
       @best_progress = 0
       @best_round = :NONE
@@ -234,7 +235,7 @@ class CrypTracker < Tracker
   end
 
   def stuckness
-    u_t.weird_count * 90 + u_t.uncommon_count * 20 - u_t.progress
+    u_t.weird_count * 90 + u_t.uncommon_count ** 2 * 10 - u_t.progress
   end
 
 
@@ -287,6 +288,7 @@ class CrypTracker < Tracker
 
   def update_guesses
     @g_t.gather_good_guesses(self)
+    first_word_bonus
   end
 
   def delete_bad_guesses_from_likely_words
@@ -304,7 +306,26 @@ class CrypTracker < Tracker
   end
 
 
+  module Bonus
 
+    FIRST_WORD_BONUSES = {"the" => 50, "i" => 50}
+    def first_word_bonus
+
+      @g_t.all.values.each do |guesses|
+        guesses.each do |guess|
+          word = @u_t.all[guess.cryp_text]
+          if word.rel_location.include?(0) && word.word_or_name == :word
+
+            if FIRST_WORD_BONUSES.keys.include?(guess.solution)
+              binding.pry
+              guess.bonuses[:first_word] = FIRST_WORD_BONUSES[guess.solution]
+            end
+          end
+        end
+      end
+    end
+  end
+  include Bonus
 
   # include Restrospect
 
@@ -319,6 +340,7 @@ class CrypTracker < Tracker
       apply_eq(guess.eq)
       update_likely_words
       g_t.gather_good_guesses(self)
+      first_word_bonus
     end
     def go_back_wiser(bad_guess)
       binding.pry if bad_guess.is_a?(Array)
@@ -326,6 +348,7 @@ class CrypTracker < Tracker
       @g_t.bad_guesses << bad_guess
       self.delete_bad_guesses_from_likely_words
       @g_t.gather_good_guesses(self)
+      first_word_bonus
 
 
     end
@@ -371,7 +394,6 @@ class CrypTracker < Tracker
         count += 1
         if @round > 40
           reset_to_round(@best_round)
-          binding.pry
           break
         end
         go_back_wiser(bad_guess)
@@ -382,7 +404,6 @@ class CrypTracker < Tracker
   include CrypSolver
 
 end
-
 
 
 

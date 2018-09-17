@@ -64,7 +64,7 @@ module Grammar
       if "-—".include?(word[1])
         attribution += 30
       end
-      if prev_word && prev_word.rel_location = :end
+      if prev_word && prev_word.rel_location[-1] = :end
         attribution += 30
       end
     elsif prev_word
@@ -74,6 +74,7 @@ module Grammar
     info[:attribution] = attribution
     return info
   end
+
 
 
 

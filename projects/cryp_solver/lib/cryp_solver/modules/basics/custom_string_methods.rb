@@ -1,5 +1,14 @@
 module UsefulStrings
 
+
+  #borrowed this from online. gets the indeces of a regular expression
+  def indices e
+    start, result = -1, []
+    result << start while start = (self.index e, start + 1)
+    result
+  end
+
+
   def is_upper?
     self == self.upcase
   end
@@ -110,7 +119,7 @@ module UsefulStrings
     return false
   end
 
-# if string has no 'a', will return 'a', if it has an 'a' but no 'b', will return 'b'. Has "ab", but no c? C is returned. And so on.
+  # if string has no 'a', will return 'a', if it has an 'a' but no 'b', will return 'b'. Has "ab", but no c? C is returned. And so on.
   def next_available_char
     ('a'..'z').each do |char|
       unless self.downcase.include?(char)
@@ -213,6 +222,9 @@ module DatableStrings
     by = options[:by] || by = default
     if by == :word
       items = self.downcase.split(/ /)
+      return_hash = items.remove_hyphenation
+      items = return_hash[:new_arr]
+      hys_posns = return_hash[:hys_posns]
       proper = false
       quote_locs = items.remove_quote_marks
     elsif by == :letter
