@@ -18,7 +18,7 @@ class Guess
   Equivalency = Struct.new(:word_or_letter, :cryp_text, :solution)
 
   attr_accessor :goodness, :badness, :eq, :attempts, :tracker, :name,
-                :cryp_text, :solution, :round, :num_children,
+                :cryp_text, :solution, :round, :num_children, :wildness,
                 :bonuses, :word_or_letter, :parent, :depth, :doubt
 
   @@all_guesses = []
@@ -39,7 +39,12 @@ class Guess
     @bonuses = {}
     @depth = 0
     @doubt = 0
+    @wildness = wildness = 100/@name.length
+
+    #There are certain guesses that you make early on, that are for short words, and that you
+    #should easily take back if not working out
     @num_children = 0
+
     # end
   end
   #

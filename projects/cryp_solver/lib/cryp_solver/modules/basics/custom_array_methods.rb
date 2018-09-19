@@ -9,6 +9,11 @@ module UsefulArrays
     self.map! {|num| ceiling * num/sum}
   end
 
+  def average
+    sum = self.inject(0,:+)
+    sum/self.length
+  end
+
   def max_attribute(attribute)
     max = 0
     self.each do |x|

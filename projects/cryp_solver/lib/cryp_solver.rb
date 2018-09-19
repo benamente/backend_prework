@@ -3,7 +3,10 @@ require 'require_all'
 # require './lib/cryp_solver/structs/Probability.rb'
 require_rel 'cryp_solver'
 require_relative 'cryp_maker.rb'
-require_relative 'solve_many.rb'
+
+if __FILE__ == $0
+  require_relative 'solve_many.rb'
+end
 
 
 
@@ -18,8 +21,7 @@ end
 
 def solve_me_a_cgram
   puts "Enter a cryptogram! Must be more than 10 characters, no double quotes,
-or proper names unless attributed at the end such as --Hjwrt Wfds Lrth.
-No numbers yet either. I'm working on it.\n"
+or proper names unless attributed at the end such as --Hjwrt Wfds Lrth.\n"
   puts "Or... press enter and I'll solve one from my database.\n"
   puts "Or... enter 'm' and then some text, and I'll make a cryptogram to solve."
 
@@ -36,6 +38,7 @@ No numbers yet either. I'm working on it.\n"
   t1 = CrypTracker.new(string: cgram_s)
   t1.solve(:print)
 
+  puts "SOLUTION:"
   p t1.solution
 end
 

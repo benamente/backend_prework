@@ -60,9 +60,7 @@ def solve_ciph
   ciphered_text = gets.chomp.downcase
   alphabet = ('a'..'z').to_a
   solutions = {}
-  puts "Trying all 26 possibilities."
   for i in (1..26) do
-    p i
     code_alphabet = alphabet.rotate(i)
     alpha_hash = alphabet.zip(code_alphabet).to_h
     solution = []
@@ -76,7 +74,9 @@ def solve_ciph
     words = solution.join.split(" ")
     score = 0
     words.each do |word|
-      score += WordSearch.word_likelihood(word.downcase)
+      if WordSearch.common_word?(word.downcase)
+        score += 1
+      end
     end
     solutions[score] = solution.join
   end

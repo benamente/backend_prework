@@ -1,7 +1,14 @@
 module UsefulStrings
 
-
-
+#returns a score out of 100, 100 meaning the strings are exactly the same
+  def similarity(other)
+    ocs = other.chars
+    same_count = 0
+    self.chars.each_with_index do |char, i|
+      same_count += 1 if ocs[i] == char
+    end
+    same_count * 100 / self.length
+  end
 
   def is_upper?
     self == self.upcase
@@ -100,6 +107,7 @@ module UsefulStrings
     end
     return r_chars.uniq
   end
+
 
   def has_repeater_chars?(*not_counting)
     char_list = []

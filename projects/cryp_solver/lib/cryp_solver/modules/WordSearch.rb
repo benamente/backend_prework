@@ -15,4 +15,12 @@ module WordSearch
     end
   end
 
+  def self.common_word?(string)
+    if Vocab::ALL_COMMON_FORMS.include?(string.delete(".,-?!:;\"\'"))
+      return true
+    else
+      return false
+    end
+  end
+
 end

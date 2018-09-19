@@ -20,14 +20,15 @@ require_relative "lib/cryp_maker"
 
 #
 
-cgram_s = make_cgram("Life is 10 percent what happens to me and 90 percent of how I react to it. --Charles Swindoll")
+cgram_s = make_cgram("Leadership is the art of getting someone else to do something you want done because he wants to do it. --Dwight Eisenhower")
+# cgram_s = make_cgram("I have learned over the years that when one's mind is made up, this diminishes fear. --Rosa Parks")
+
 p cgram_s
 t1 = CrypTracker.new(string: cgram_s)
 # binding.pry
-t1.solve
+t1.solve(:print)
 p t1.solution
   t1.u_t.print_with(atts:[:name, :x_string, :likely_solutions, :word_or_name])
 t1.l_t.print_with(atts:[:name, :perc_freq, :freq, :likely_not], limit: 50)
-binding.pry
 
  # t1.g_t.print_with(atts:[:cryp_text, :solution, :goodness])

@@ -1,7 +1,7 @@
-
+require "pry"
 def make_cgram(text)
   alphabet = ("a".."z").to_a
-  cipherbet = alphabet.clone.shuffle
+  cipherbet = alphabet.clone.shuffle_sameless
   cipher = alphabet.zip(cipherbet).to_h
 
   cryptext = text.downcase.chars.map do |c|
@@ -13,6 +13,25 @@ def make_cgram(text)
   end
   return cryptext.join.upcase
 
+end
+
+class Array
+  def sample_except(exceptions)
+    self.reject{|x| exceptions.include?(x)}.sample
+  end
+  def shuffle_sameless
+    old = self.clone
+    shuffled = []
+    self.each do |item|
+      shuffled << old.sample_except([item] + shuffled)
+    end
+    if shuffled[-1] == nil
+      s = shuffled.sample_except([nil])
+      shuffled[-1] = s
+      shuffled[shuffled.index(s)] = self[-1]
+    end
+    return shuffled
+  end
 end
 
 def make_gram_for_user

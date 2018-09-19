@@ -369,7 +369,8 @@ class CrypTracker < Tracker
       binding.pry if bad_guess.is_a?(Array)
       r = reach_back_for_undoubted_round(bad_guess)
       reset_to_round(r)
-      @g_t.bad_guesses -= @g_t.get_descendants(bad_guess)
+      # binding.pry
+      # @g_t.bad_guesses -= @g_t.get_descendants(bad_guess)
       @g_t.bad_guesses << bad_guess
       self.delete_bad_guesses_from_likely_words
       @g_t.gather_good_guesses(self)
@@ -392,8 +393,9 @@ class CrypTracker < Tracker
           self.g_t.print_with(atts:[:cryp_text, :solution, :goodness])
           self.u_t.print_with(atts:[:name, :x_string, :likely_solutions, :commonness])
         end
-
         self.new_round
+
+
         # binding.pry
         #binding.pry if self.stuckness > 50
 
@@ -405,6 +407,8 @@ class CrypTracker < Tracker
         if self.implement_best_guess == :stuck
           return @g_t.regrettable_guess
         end
+
+
         # t1.u_t.print_with(atts:[:name, :x_string, :likely_solutions, :word_or_name])
         # break if count == 1
       end
@@ -414,13 +418,14 @@ class CrypTracker < Tracker
     def solve(*options)
       loop do
         bad_guess = self.guess_until_stuck(*options)
+        unless bad_guess
+          # binding.pry
+          break
+        end
         if options.include?(:print)
           puts "\nGuessing #{bad_guess.solution.upcase} was a dead end. I'm going back.\n"
         end
-        unless bad_guess
-          binding.pry
-          break
-        end
+
         if @u_t.progress == 100
           break
         end
@@ -547,12 +552,11 @@ class GuessTracker < Tracker
     return desc if desc == []
     desc.each do |g|
       if g.num_children == 0
-        return desc
+        next
       else
         desc += get_descendants(g)
       end
     end
-    binding.pry
 
     return desc
   end
